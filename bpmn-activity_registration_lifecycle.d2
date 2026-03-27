@@ -1,0 +1,125 @@
+direction: right
+
+title: "BPMN — Activity Registration Lifecycle" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+user_lane: "👤 User" {
+  style.fill: "#E3F2FD"
+  style.stroke: "#1565C0"
+  style.border-radius: 12
+
+  start: "" {shape: circle; style.fill: "#263238"; width: 24; height: 24}
+
+  t1: "Browse\nkegiatan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  t2: "Lihat detail\nkegiatan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  t3: "Klik Daftar\nKegiatan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+  ev_notif: "📩 Terima\nnotifikasi" {
+    shape: circle
+    style.fill: "#FFF9C4"
+    style.stroke: "#F57F17"
+    width: 60
+    height: 60
+  }
+
+  ev_points: "🪙 Poin\nbertambah" {
+    shape: circle
+    style.fill: "#FFF9C4"
+    style.stroke: "#F57F17"
+    width: 60
+    height: 60
+  }
+
+  start -> t1
+  t1 -> t2
+  t2 -> t3
+}
+
+system_lane: "⚙️ System (Backend)" {
+  style.fill: "#FFF3E0"
+  style.stroke: "#E65100"
+  style.border-radius: 12
+
+  t4: "Auth Guard\nJWT + Verified" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+  gw1: "Verified?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  gw2: "Active &\nopen?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  gw3: "Before\ndeadline?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  gw4: "Quota\navailable?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  gw5: "Not\nduplicate?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  gw6: "Has reward\npoints?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+  t5: "Snapshot profile" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t6: "Create registration\nstatus = pending" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t7: "Create point_transaction\ntype = reward" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+  t8: "Update user.points" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+
+  err1: "❌ 403" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  err2: "❌ 400\nInactive" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  err3: "❌ 400\nDeadline" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  err4: "❌ 400\nFull" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  err5: "❌ 409\nDuplicate" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+  t4 -> gw1
+  gw1 -> gw2: "ya" {style.stroke: "#2E7D32"}
+  gw1 -> err1: "tidak" {style.stroke: "#C62828"}
+  gw2 -> gw3: "ya" {style.stroke: "#2E7D32"}
+  gw2 -> err2: "tidak" {style.stroke: "#C62828"}
+  gw3 -> gw4: "ya" {style.stroke: "#2E7D32"}
+  gw3 -> err3: "tidak" {style.stroke: "#C62828"}
+  gw4 -> gw5: "ya" {style.stroke: "#2E7D32"}
+  gw4 -> err4: "tidak" {style.stroke: "#C62828"}
+  gw5 -> t5: "ya" {style.stroke: "#2E7D32"}
+  gw5 -> err5: "tidak" {style.stroke: "#C62828"}
+  t5 -> t6
+  t6 -> gw6
+  gw6 -> t7: "ya" {style.stroke: "#F57F17"}
+  t7 -> t8
+}
+
+admin_lane: "👨‍💼 Admin" {
+  style.fill: "#F3E5F5"
+  style.stroke: "#6A1B9A"
+  style.border-radius: 12
+
+  t9: "Lihat peserta\nkegiatan" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  t10: "Review\nregistrasi" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+
+  gw7: "Keputusan?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+  t11: "Status\n= approved" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  t12: "Status\n= rejected" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+  t9 -> t10
+  t10 -> gw7
+  gw7 -> t11: "approve" {style.stroke: "#2E7D32"}
+  gw7 -> t12: "reject" {style.stroke: "#C62828"}
+}
+
+end_ok: "✅ Registered" {shape: circle; style.fill: "#2E7D32"; style.font-color: "#FFF"; width: 50; height: 50}
+end_reject: "❌ Rejected" {shape: circle; style.fill: "#C62828"; style.font-color: "#FFF"; width: 50; height: 50}
+end_error: "⛔ Error" {shape: circle; style.fill: "#9E9E9E"; width: 40; height: 40}
+
+# ── Cross-lane ──
+user_lane.t3 -> system_lane.t4 {style.stroke: "#1565C0"}
+
+system_lane.t8 -> user_lane.ev_points {style.stroke: "#F57F17"}
+system_lane.gw6 -> user_lane.ev_notif: "tidak\n(no points)" {style.stroke: "#78909C"; style.stroke-dash: 3}
+
+system_lane.t6 -> admin_lane.t9: "pending" {style.stroke: "#6A1B9A"}
+
+admin_lane.t11 -> user_lane.ev_notif {style.stroke: "#2E7D32"}
+admin_lane.t12 -> user_lane.ev_notif {style.stroke: "#C62828"}
+
+user_lane.ev_notif -> end_ok: "approved" {style.stroke: "#2E7D32"}
+user_lane.ev_notif -> end_reject: "rejected" {style.stroke: "#C62828"}
+user_lane.ev_points -> end_ok {style.stroke: "#2E7D32"}
+
+system_lane.err1 -> end_error {style.stroke: "#9E9E9E"}
+system_lane.err2 -> end_error {style.stroke: "#9E9E9E"}
+system_lane.err3 -> end_error {style.stroke: "#9E9E9E"}
+system_lane.err4 -> end_error {style.stroke: "#9E9E9E"}
+system_lane.err5 -> end_error {style.stroke: "#9E9E9E"}

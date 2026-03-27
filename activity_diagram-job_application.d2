@@ -1,0 +1,85 @@
+direction: down
+
+title: "Job Application Flow" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+start: "" {shape: circle; style.fill: "#263238"; width: 30; height: 30}
+
+u1: "Browse daftar\nlowongan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u2: "Pilih lowongan\n& lihat detail" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u3: "Klik Apply\nPOST /job-applications/:jobId/apply" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+b1: "JwtAuthGuard +\nVerifiedUserGuard" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+d_verified: "User\nterverifikasi?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_active: "Lowongan aktif &\nbelum deadline?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_dup: "Belum pernah\napply?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+db1: "Query job\nby jobId" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db2: "Cek existing application\n(user_id + job_id)" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db3: "Snapshot profile\n→ profile_histories" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db4: "Create job_applications\nstatus = pending" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+
+ok1: "✅ 201 Created\nLamaran berhasil" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8; style.bold: true}
+
+# ── Review Phase ──
+review: "👨‍💼 Reviewer (Admin / Perusahaan)" {
+  style.fill: "#F3E5F5"
+  style.stroke: "#6A1B9A"
+  style.border-radius: 12
+
+  r1: "Lihat daftar pelamar\nGET /applicants" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  r2: "Review detail lamaran\n+ profile snapshot" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  d_decision: "Keputusan?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  r3: "PATCH status = accepted" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  r4: "PATCH status = rejected" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+  r1 -> r2
+  r2 -> d_decision
+  d_decision -> r3: "accepted" {style.stroke: "#2E7D32"}
+  d_decision -> r4: "rejected" {style.stroke: "#C62828"}
+}
+
+notif_ok: "🔔 Notifikasi:\nLamaran diterima" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+notif_reject: "🔔 Notifikasi:\nLamaran ditolak" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+err_unverified: "❌ 403 Forbidden\nBelum terverifikasi" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_expired: "❌ 400 Bad Request\nLowongan ditutup" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_dup: "❌ 409 Conflict\nSudah pernah melamar" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+end_ok: "" {shape: circle; style.fill: "#2E7D32"; width: 30; height: 30}
+end_err: "" {shape: circle; style.fill: "#C62828"; width: 30; height: 30}
+
+# ── Connections ──
+start -> u1
+u1 -> u2
+u2 -> u3
+u3 -> b1
+b1 -> d_verified
+
+d_verified -> db1: "ya" {style.stroke: "#2E7D32"}
+d_verified -> err_unverified: "tidak" {style.stroke: "#C62828"}
+
+db1 -> d_active
+d_active -> db2: "ya" {style.stroke: "#2E7D32"}
+d_active -> err_expired: "tidak" {style.stroke: "#C62828"}
+
+db2 -> d_dup
+d_dup -> db3: "ya" {style.stroke: "#2E7D32"}
+d_dup -> err_dup: "tidak" {style.stroke: "#C62828"}
+
+db3 -> db4
+db4 -> ok1
+ok1 -> review.r1
+
+review.r3 -> notif_ok
+review.r4 -> notif_reject
+
+notif_ok -> end_ok
+notif_reject -> end_err
+err_unverified -> end_err
+err_expired -> end_err
+err_dup -> end_err

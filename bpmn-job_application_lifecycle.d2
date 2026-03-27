@@ -1,0 +1,126 @@
+direction: right
+
+title: "BPMN — Job Application Lifecycle" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+user_lane: "👤 User (Mahasiswa / Alumni)" {
+  style.fill: "#E3F2FD"
+  style.stroke: "#1565C0"
+  style.border-radius: 12
+
+  start: "" {shape: circle; style.fill: "#263238"; width: 24; height: 24}
+
+  t1: "Browse\nlowongan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  t2: "Lihat detail\nlowongan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  t3: "Klik Apply" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  t_history: "Lihat riwayat\nlamaran" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  t_status: "Cek status\nper lowongan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+  ev_notif: "📩 Terima\nnotifikasi\nhasil" {
+    shape: circle
+    style.fill: "#FFF9C4"
+    style.stroke: "#F57F17"
+    width: 60
+    height: 60
+  }
+
+  start -> t1
+  t1 -> t2
+  t2 -> t3
+}
+
+system_lane: "⚙️ System (Backend)" {
+  style.fill: "#FFF3E0"
+  style.stroke: "#E65100"
+  style.border-radius: 12
+
+  t4: "Auth Guard\nJWT + Verified" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+  gw1: "User\nverified?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  gw2: "Job aktif &\nbelum deadline?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  gw3: "Already\napplied?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+  t5: "Validate\njob status" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t6: "Check duplicate\napplication" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t7: "Snapshot profile\n→ profile_histories" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t8: "Create\njob_applications\nstatus = pending" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+  err1: "❌ 403\nNot verified" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  err2: "❌ 400\nJob closed" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  err3: "❌ 409\nDuplicate" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+  t4 -> gw1
+  gw1 -> t5: "ya" {style.stroke: "#2E7D32"}
+  gw1 -> err1: "tidak" {style.stroke: "#C62828"}
+  t5 -> gw2
+  gw2 -> t6: "ya" {style.stroke: "#2E7D32"}
+  gw2 -> err2: "tidak" {style.stroke: "#C62828"}
+  t6 -> gw3
+  gw3 -> t7: "belum" {style.stroke: "#2E7D32"}
+  gw3 -> err3: "sudah" {style.stroke: "#C62828"}
+  t7 -> t8
+}
+
+reviewer_lane: "👨‍💼 Reviewer (Admin / Perusahaan)" {
+  style.fill: "#F3E5F5"
+  style.stroke: "#6A1B9A"
+  style.border-radius: 12
+
+  t9: "Lihat daftar\npelamar" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  t10: "Review detail\nlamaran +\nprofile snapshot" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+
+  gw4: "Keputusan?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+  t11: "Update status\n= accepted" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  t12: "Update status\n= rejected" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+  t9 -> t10
+  t10 -> gw4
+  gw4 -> t11: "accept" {style.stroke: "#2E7D32"}
+  gw4 -> t12: "reject" {style.stroke: "#C62828"}
+}
+
+db_lane: "💾 Database" {
+  style.fill: "#E8F5E9"
+  style.stroke: "#2E7D32"
+  style.border-radius: 12
+
+  t_save: "Simpan\njob_application\n+ profile_history" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  t_update_accept: "Update status\n= accepted" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  t_update_reject: "Update status\n= rejected" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+}
+
+end_accepted: "✅ Diterima" {shape: circle; style.fill: "#2E7D32"; style.font-color: "#FFF"; width: 50; height: 50}
+end_rejected: "❌ Ditolak" {shape: circle; style.fill: "#C62828"; style.font-color: "#FFF"; width: 50; height: 50}
+end_error: "⛔ Error" {shape: circle; style.fill: "#9E9E9E"; width: 40; height: 40}
+
+# ── Cross-lane ──
+user_lane.t3 -> system_lane.t4 {style.stroke: "#1565C0"}
+system_lane.t8 -> db_lane.t_save {style.stroke: "#2E7D32"}
+db_lane.t_save -> reviewer_lane.t9 {style.stroke: "#6A1B9A"}
+
+reviewer_lane.t11 -> db_lane.t_update_accept {style.stroke: "#2E7D32"}
+reviewer_lane.t12 -> db_lane.t_update_reject {style.stroke: "#C62828"}
+
+db_lane.t_update_accept -> user_lane.ev_notif {style.stroke: "#2E7D32"}
+db_lane.t_update_reject -> user_lane.ev_notif {style.stroke: "#C62828"}
+
+user_lane.ev_notif -> end_accepted: "accepted" {style.stroke: "#2E7D32"}
+user_lane.ev_notif -> end_rejected: "rejected" {style.stroke: "#C62828"}
+
+system_lane.err1 -> end_error {style.stroke: "#9E9E9E"}
+system_lane.err2 -> end_error {style.stroke: "#9E9E9E"}
+system_lane.err3 -> end_error {style.stroke: "#9E9E9E"}
+
+# ── Parallel user actions ──
+user_lane.ev_notif -> user_lane.t_history: "optional" {
+  style.stroke: "#78909C"
+  style.stroke-dash: 3
+}
+user_lane.ev_notif -> user_lane.t_status: "optional" {
+  style.stroke: "#78909C"
+  style.stroke-dash: 3
+}

@@ -1,0 +1,94 @@
+direction: down
+
+title: "Activity Registration + Reward Points Flow" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+start: "" {shape: circle; style.fill: "#263238"; width: 30; height: 30}
+
+u1: "Browse daftar\nkegiatan" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u2: "Pilih kegiatan\n& lihat detail" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u3: "Klik Daftar\nPOST /activity-registrations\n/:activityId/register" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+b1: "JwtAuthGuard +\nVerifiedUserGuard" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+d_verified: "User\nterverifikasi?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_active: "Kegiatan masih\nmenerima registrasi?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_deadline: "Belum melewati\ndeadline?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_quota: "Kuota masih\ntersedia?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_dup: "Belum pernah\ndaftar?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_points: "Activity punya\nreward_points > 0?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+db1: "Query activity\nby activityId" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db2: "Count existing\nregistrations" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db3: "Cek duplikat\n(user_id + activity_id)" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db4: "Snapshot profile\n→ profile_histories" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db5: "Create activity_registrations\nstatus = pending" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+
+points_flow: "🪙 Reward Points" {
+  style.fill: "#FFF8E1"
+  style.stroke: "#F57F17"
+  style.border-radius: 12
+
+  p1: "Create point_transactions\ntype = reward\nstatus = active" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+  p2: "Set expires_at" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+  p3: "Update users.points\n+= reward_points" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+
+  p1 -> p2
+  p2 -> p3
+}
+
+ok1: "✅ 201 Created\nRegistrasi berhasil" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8; style.bold: true}
+ok2: "✅ 201 Created\nRegistrasi berhasil\n+ poin didapat" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8; style.bold: true}
+
+err_unverified: "❌ 403 Forbidden" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_inactive: "❌ 400 Kegiatan\ntidak tersedia" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_deadline: "❌ 400 Pendaftaran\nditutup" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_quota: "❌ 400 Kuota\nsudah penuh" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_dup: "❌ 409 Sudah\nterdaftar" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+end_ok: "" {shape: circle; style.fill: "#2E7D32"; width: 30; height: 30}
+end_err: "" {shape: circle; style.fill: "#C62828"; width: 30; height: 30}
+
+# ── Connections ──
+start -> u1
+u1 -> u2
+u2 -> u3
+u3 -> b1
+b1 -> d_verified
+
+d_verified -> db1: "ya" {style.stroke: "#2E7D32"}
+d_verified -> err_unverified: "tidak" {style.stroke: "#C62828"}
+
+db1 -> d_active
+d_active -> d_deadline: "ya" {style.stroke: "#2E7D32"}
+d_active -> err_inactive: "tidak" {style.stroke: "#C62828"}
+
+d_deadline -> db2: "ya" {style.stroke: "#2E7D32"}
+d_deadline -> err_deadline: "tidak" {style.stroke: "#C62828"}
+
+db2 -> d_quota
+d_quota -> db3: "ya" {style.stroke: "#2E7D32"}
+d_quota -> err_quota: "tidak" {style.stroke: "#C62828"}
+
+db3 -> d_dup
+d_dup -> db4: "ya" {style.stroke: "#2E7D32"}
+d_dup -> err_dup: "tidak" {style.stroke: "#C62828"}
+
+db4 -> db5
+db5 -> d_points
+
+d_points -> points_flow.p1: "ya" {style.stroke: "#F57F17"}
+d_points -> ok1: "tidak" {style.stroke: "#78909C"}
+
+points_flow.p3 -> ok2
+
+ok1 -> end_ok
+ok2 -> end_ok
+err_unverified -> end_err
+err_inactive -> end_err
+err_deadline -> end_err
+err_quota -> end_err
+err_dup -> end_err

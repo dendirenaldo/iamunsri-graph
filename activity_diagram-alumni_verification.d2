@@ -1,0 +1,146 @@
+direction: down
+
+title: "Alumni / Mahasiswa Verification Flow" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+start: "" {shape: circle; style.fill: "#263238"; width: 30; height: 30}
+
+u1: "User login &\nbuka menu Verifikasi" {
+  shape: rectangle
+  style.fill: "#BBDEFB"
+  style.stroke: "#1565C0"
+  style.border-radius: 8
+}
+
+d_method: "Pilih metode\nverifikasi?" {
+  shape: diamond
+  style.fill: "#E8EAF6"
+  style.stroke: "#5C6BC0"
+}
+
+# ── EMAIL PATH ──
+email_branch: "📧 Email Kampus Path" {
+  style.fill: "#F8F9FA"
+  style.stroke: "#CFD8DC"
+  style.border-radius: 12
+
+  e1: "Input email kampus" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  e2: "POST /verification/\nsend-student-email" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  d_domain: "Domain\nvalid?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  e3: "Generate kode 6 digit\n+ set expires_at" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  e4: "Simpan\nverification_codes" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  e5: "Kirim email OTP\nvia SMTP" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  e6: "User input kode\nPOST verify-student-code" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  d_code: "Kode valid &\nbelum expired?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  e7: "Query SIMAK API\nvalidasi data" {style.fill: "#FCE4EC"; style.stroke: "#C62828"; style.border-radius: 8}
+  d_simak: "Data SIMAK\ncocok?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  e8: "user.is_verified = true\nUpdate profile dari SIMAK" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  e9: "Buat student_verifications\nstatus = pending" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+
+  e1 -> e2
+  e2 -> d_domain
+  d_domain -> e3: "ya" {style.stroke: "#2E7D32"}
+  e3 -> e4
+  e4 -> e5
+  e5 -> e6
+  e6 -> d_code
+  d_code -> e7: "ya" {style.stroke: "#2E7D32"}
+  e7 -> d_simak
+  d_simak -> e8: "cocok" {style.stroke: "#2E7D32"}
+  d_simak -> e9: "tidak cocok /\nSIMAK gagal" {style.stroke: "#FF9800"}
+}
+
+# ── DOCUMENT PATH ──
+doc_branch: "📄 Upload Dokumen Path" {
+  style.fill: "#F8F9FA"
+  style.stroke: "#CFD8DC"
+  style.border-radius: 12
+
+  dc1: "Pilih file dokumen\n(KTM / Ijazah)" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+  dc2: "POST /verification/\nupload-document" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  d_file: "File valid?\n(size, type, mime)" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  dc3: "Simpan file\nke /uploads" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  dc4: "Buat document_verifications\nstatus = pending" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+
+  dc1 -> dc2
+  dc2 -> d_file
+  d_file -> dc3: "ya" {style.stroke: "#2E7D32"}
+  dc3 -> dc4
+}
+
+# ── ADMIN REVIEW ──
+admin_review: "👨‍💼 Admin Review" {
+  style.fill: "#F3E5F5"
+  style.stroke: "#6A1B9A"
+  style.border-radius: 12
+
+  a1: "Lihat antrian\nverifikasi" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  a2: "Review data /\ndokumen" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  d_admin: "Keputusan\nadmin?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+  a3: "status = approved\nuser.is_verified = true\nreviewed_by = admin_id" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  a4: "status = rejected\nsimpan admin_notes\nreviewed_by = admin_id" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+  a1 -> a2
+  a2 -> d_admin
+  d_admin -> a3: "approve" {style.stroke: "#2E7D32"}
+  d_admin -> a4: "reject" {style.stroke: "#C62828"}
+}
+
+# ── Results ──
+ok_verified: "✅ Status: Terverifikasi" {
+  style.fill: "#C8E6C9"
+  style.stroke: "#2E7D32"
+  style.border-radius: 8
+  style.bold: true
+}
+
+ok_notif_approve: "🔔 Notifikasi:\nVerifikasi disetujui" {
+  style.fill: "#C8E6C9"
+  style.stroke: "#2E7D32"
+  style.border-radius: 8
+}
+
+err_notif_reject: "🔔 Notifikasi:\nVerifikasi ditolak" {
+  style.fill: "#FFCDD2"
+  style.stroke: "#C62828"
+  style.border-radius: 8
+}
+
+err_domain: "❌ Error:\nDomain tidak valid" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_code: "❌ Error:\nKode invalid / expired" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_file: "❌ Error:\nFile tidak valid" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+end_ok: "" {shape: circle; style.fill: "#2E7D32"; width: 30; height: 30}
+end_err: "" {shape: circle; style.fill: "#C62828"; width: 30; height: 30}
+
+# ── Main Flow ──
+start -> u1
+u1 -> d_method
+
+d_method -> email_branch.e1: "Email Kampus" {style.stroke: "#1565C0"}
+d_method -> doc_branch.dc1: "Upload Dokumen" {style.stroke: "#E65100"}
+
+# Email path results
+email_branch.e8 -> ok_verified
+email_branch.e9 -> admin_review.a1
+email_branch.d_domain -> err_domain: "tidak" {style.stroke: "#C62828"}
+email_branch.d_code -> err_code: "tidak" {style.stroke: "#C62828"}
+
+# Doc path results
+doc_branch.dc4 -> admin_review.a1
+doc_branch.d_file -> err_file: "tidak" {style.stroke: "#C62828"}
+
+# Admin results
+admin_review.a3 -> ok_notif_approve
+admin_review.a4 -> err_notif_reject
+
+# Endings
+ok_verified -> end_ok
+ok_notif_approve -> end_ok
+err_notif_reject -> end_err
+err_domain -> end_err
+err_code -> end_err
+err_file -> end_err

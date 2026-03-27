@@ -1,0 +1,78 @@
+direction: down
+
+title: "IamUNSRI ERD — Career Domain" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+users: Users {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  full_name: varchar
+  email: varchar
+  role_id: int {constraint: foreign_key}
+}
+
+companies: Companies {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  name: varchar {constraint: unique}
+  logo: varchar
+  description: text
+  website: varchar
+  created_at: datetime
+  updated_at: datetime
+}
+
+jobs: Jobs {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  company_id: int {constraint: foreign_key}
+  user_id: int {constraint: foreign_key}
+  title: varchar
+  description: text
+  type: enum
+  work_mode: enum
+  job_status: enum
+  application_method: enum
+  publish_start: datetime
+  publish_end: datetime
+  application_deadline: datetime
+  responsibilities: json
+  qualifications: json
+  benefits: json
+  is_sync_disabled: boolean
+  created_at: datetime
+  updated_at: datetime
+}
+
+job_applications: Job_Applications {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  job_id: int {constraint: foreign_key}
+  profile_history_id: int {constraint: foreign_key}
+  status: enum
+  created_at: datetime
+  updated_at: datetime
+}
+
+profile_histories: Profile_Histories {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  profile_id: int {constraint: foreign_key}
+  snapshot: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+# Relationships
+companies -> jobs: "1..*" {style.stroke: "#FF9800"}
+users -> jobs: "creates 1..*" {style.stroke: "#4CAF50"}
+jobs -> job_applications: "1..*" {style.stroke: "#F44336"}
+users -> job_applications: "submits 1..*" {style.stroke: "#9C27B0"}
+profile_histories -> job_applications: "snapshot ref" {
+  style.stroke: "#607D8B"
+  style.stroke-dash: 3
+}

@@ -1,0 +1,120 @@
+direction: down
+
+title: "Voucher Redemption (FIFO Point Consume) Flow" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+start: "" {shape: circle; style.fill: "#263238"; width: 30; height: 30}
+
+u1: "Buka halaman\nVoucher" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u2: "Pilih voucher\n& lihat detail" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u3: "Klik Redeem\nPOST /points/redeem" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+b1: "JwtAuthGuard +\nVerifiedUserGuard" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+d_verified: "User\nterverifikasi?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_exists: "Voucher\nexists?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_stock: "Stock > 0?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_points: "Points >=\npoints_required?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_type: "redeem_type\n== integrated?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_partner: "Partner API\nsuccess?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+db1: "Query voucher\nby id" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+db2: "Query user\ncurrent points" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+
+fifo: "🪙 FIFO Point Consume" {
+  style.fill: "#FFF8E1"
+  style.stroke: "#F57F17"
+  style.border-radius: 12
+
+  f1: "Query active point_transactions\nORDER BY created_at ASC" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+  f2: "Loop: kurangi points_remaining\nMark consumed jika habis" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+  f3: "Create point_transactions\ntype = redeem" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+  f4: "Update vouchers\nstock -= 1" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+  f5: "Update users.points\n-= points_required" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+
+  f1 -> f2
+  f2 -> f3
+  f3 -> f4
+  f4 -> f5
+}
+
+partner: "🌐 Voucher Partner API" {
+  style.fill: "#FCE4EC"
+  style.stroke: "#C62828"
+  style.border-radius: 12
+
+  pa1: "Call partner API\n(apiUrl + payload)" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+  pa2: "Store redeem_data\n(partner response)" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+  pa1 -> pa2
+}
+
+rollback: "⚠️ Rollback" {
+  style.fill: "#FFF3E0"
+  style.stroke: "#E65100"
+  style.border-radius: 12
+
+  rb1: "Restore points_remaining" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  rb2: "Delete redeem transaction" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  rb3: "Restore voucher stock" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  rb4: "Restore user points" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+  rb1 -> rb2
+  rb2 -> rb3
+  rb3 -> rb4
+}
+
+ok_internal: "✅ Redeem berhasil\n(internal)" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8; style.bold: true}
+ok_partner: "✅ Redeem berhasil\n+ kode partner" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8; style.bold: true}
+
+err_unverified: "❌ 403 Forbidden" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_notfound: "❌ 404 Not Found" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_stock: "❌ 400 Voucher habis" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_points: "❌ 400 Poin\ntidak cukup" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_partner: "❌ Gagal redeem\ncoba lagi" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+end_ok: "" {shape: circle; style.fill: "#2E7D32"; width: 30; height: 30}
+end_err: "" {shape: circle; style.fill: "#C62828"; width: 30; height: 30}
+
+# ── Connections ──
+start -> u1
+u1 -> u2
+u2 -> u3
+u3 -> b1
+b1 -> d_verified
+
+d_verified -> db1: "ya" {style.stroke: "#2E7D32"}
+d_verified -> err_unverified: "tidak" {style.stroke: "#C62828"}
+
+db1 -> d_exists
+d_exists -> d_stock: "ya" {style.stroke: "#2E7D32"}
+d_exists -> err_notfound: "tidak" {style.stroke: "#C62828"}
+
+d_stock -> db2: "ya" {style.stroke: "#2E7D32"}
+d_stock -> err_stock: "tidak" {style.stroke: "#C62828"}
+
+db2 -> d_points
+d_points -> fifo.f1: "ya" {style.stroke: "#2E7D32"}
+d_points -> err_points: "tidak" {style.stroke: "#C62828"}
+
+fifo.f5 -> d_type
+
+d_type -> partner.pa1: "ya (integrated)" {style.stroke: "#C62828"}
+d_type -> ok_internal: "tidak (internal)" {style.stroke: "#2E7D32"}
+
+partner.pa2 -> d_partner
+d_partner -> ok_partner: "ya" {style.stroke: "#2E7D32"}
+d_partner -> rollback.rb1: "tidak" {style.stroke: "#C62828"}
+
+rollback.rb4 -> err_partner
+
+ok_internal -> end_ok
+ok_partner -> end_ok
+err_unverified -> end_err
+err_notfound -> end_err
+err_stock -> end_err
+err_points -> end_err
+err_partner -> end_err

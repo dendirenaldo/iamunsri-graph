@@ -1,0 +1,170 @@
+direction: right
+
+title: "BPMN — Point Reward & Redemption Lifecycle" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+# ══════════════════════════
+# REWARD PROCESS (TOP)
+# ══════════════════════════
+reward_section: "🪙 REWARD — Point Earning" {
+  style.fill: "#F8F9FA"
+  style.stroke: "#CFD8DC"
+  style.border-radius: 16
+
+  user_r: "👤 User" {
+    style.fill: "#E3F2FD"
+    style.stroke: "#1565C0"
+    style.border-radius: 10
+
+    r_start: "" {shape: circle; style.fill: "#263238"; width: 24; height: 24}
+    r_t1: "Daftar kegiatan\n(activity registration)" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+    r_start -> r_t1
+  }
+
+  system_r: "⚙️ System" {
+    style.fill: "#FFF3E0"
+    style.stroke: "#E65100"
+    style.border-radius: 10
+
+    r_t2: "Registration\nsukses" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+    r_gw1: "Activity has\nreward_points?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+    r_t3: "Create\npoint_transaction\ntype = reward\nstatus = active" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+    r_t4: "Set points\n& points_remaining\n& expires_at" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+    r_t5: "Update\nusers.points\n+= amount" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+
+    r_no_points: "No points\nawarded" {style.fill: "#F5F5F5"; style.stroke: "#9E9E9E"; style.border-radius: 8}
+
+    r_t2 -> r_gw1
+    r_gw1 -> r_t3: "ya" {style.stroke: "#F57F17"}
+    r_gw1 -> r_no_points: "tidak" {style.stroke: "#9E9E9E"}
+    r_t3 -> r_t4
+    r_t4 -> r_t5
+  }
+
+  r_end: "✅ Points\nEarned" {shape: circle; style.fill: "#2E7D32"; style.font-color: "#FFF"; width: 50; height: 50}
+
+  user_r.r_t1 -> system_r.r_t2 {style.stroke: "#E65100"}
+  system_r.r_t5 -> r_end {style.stroke: "#2E7D32"}
+  system_r.r_no_points -> r_end {style.stroke: "#9E9E9E"}
+}
+
+# ══════════════════════════
+# EXPIRY PROCESS (MIDDLE)
+# ══════════════════════════
+expiry_section: "⏰ EXPIRY — Daily Cron Job" {
+  style.fill: "#F8F9FA"
+  style.stroke: "#CFD8DC"
+  style.border-radius: 16
+
+  cron_lane: "🤖 Cron Scheduler" {
+    style.fill: "#ECEFF1"
+    style.stroke: "#37474F"
+    style.border-radius: 10
+
+    e_start: "⏰ Daily\n01:00" {shape: circle; style.fill: "#263238"; style.font-color: "#FFF"; width: 50; height: 50}
+    e_t1: "Query point_transactions\ntype = reward\nstatus = active\nexpires_at < NOW()" {style.fill: "#CFD8DC"; style.stroke: "#37474F"; style.border-radius: 8}
+    e_t2: "Set status\n= expired\npoints_remaining = 0" {style.fill: "#CFD8DC"; style.stroke: "#37474F"; style.border-radius: 8}
+    e_t3: "Update users.points\n-= expired amount" {style.fill: "#CFD8DC"; style.stroke: "#37474F"; style.border-radius: 8}
+
+    e_start -> e_t1
+    e_t1 -> e_t2
+    e_t2 -> e_t3
+  }
+
+  e_end: "✅ Expired\npoints cleared" {shape: circle; style.fill: "#FF9800"; style.font-color: "#FFF"; width: 50; height: 50}
+
+  cron_lane.e_t3 -> e_end {style.stroke: "#FF9800"}
+}
+
+# ══════════════════════════
+# REDEMPTION PROCESS (BOTTOM)
+# ══════════════════════════
+redeem_section: "🎟️ REDEEM — Voucher Redemption" {
+  style.fill: "#F8F9FA"
+  style.stroke: "#CFD8DC"
+  style.border-radius: 16
+
+  user_d: "👤 User" {
+    style.fill: "#E3F2FD"
+    style.stroke: "#1565C0"
+    style.border-radius: 10
+
+    d_start: "" {shape: circle; style.fill: "#263238"; width: 24; height: 24}
+    d_t1: "Pilih voucher\n& klik Redeem" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+    d_start -> d_t1
+  }
+
+  system_d: "⚙️ System" {
+    style.fill: "#FFF3E0"
+    style.stroke: "#E65100"
+    style.border-radius: 10
+
+    d_t2: "Validate\nvoucher stock\n& user points" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+    d_gw1: "Points\nsufficient &\nstock > 0?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+    d_t3: "FIFO: Query active\nreward transactions\nORDER BY created_at" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+    d_t4: "Loop: consume\npoints_remaining\nfrom each bucket" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+    d_t5: "Create\npoint_transaction\ntype = redeem" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+    d_t6: "Voucher stock -= 1\nUser points -= N" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+
+    d_gw2: "redeem_type\nintegrated?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+    d_err: "❌ Insufficient\npoints / stock" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+
+    d_t2 -> d_gw1
+    d_gw1 -> d_t3: "ya" {style.stroke: "#2E7D32"}
+    d_gw1 -> d_err: "tidak" {style.stroke: "#C62828"}
+    d_t3 -> d_t4
+    d_t4 -> d_t5
+    d_t5 -> d_t6
+    d_t6 -> d_gw2
+  }
+
+  partner_d: "🌐 Partner API" {
+    style.fill: "#FCE4EC"
+    style.stroke: "#C62828"
+    style.border-radius: 10
+
+    p_t1: "Call partner\nredemption API" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+    p_gw: "Success?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+    p_t2: "Store\nredeem_data" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+    p_t3: "Rollback\nall changes" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+    p_t1 -> p_gw
+    p_gw -> p_t2: "ya" {style.stroke: "#2E7D32"}
+    p_gw -> p_t3: "tidak" {style.stroke: "#C62828"}
+  }
+
+  d_end_ok: "✅ Redeemed" {shape: circle; style.fill: "#2E7D32"; style.font-color: "#FFF"; width: 50; height: 50}
+  d_end_err: "❌ Failed" {shape: circle; style.fill: "#C62828"; style.font-color: "#FFF"; width: 50; height: 50}
+
+  user_d.d_t1 -> system_d.d_t2 {style.stroke: "#E65100"}
+
+  system_d.d_gw2 -> partner_d.p_t1: "ya (integrated)" {style.stroke: "#C62828"}
+  system_d.d_gw2 -> d_end_ok: "tidak (internal)" {style.stroke: "#2E7D32"}
+
+  partner_d.p_t2 -> d_end_ok {style.stroke: "#2E7D32"}
+  partner_d.p_t3 -> d_end_err {style.stroke: "#C62828"}
+  system_d.d_err -> d_end_err {style.stroke: "#C62828"}
+}
+
+# ══════════════════════════
+# LIFECYCLE CONNECTIONS
+# ══════════════════════════
+reward_section.r_end -> expiry_section.cron_lane.e_start: "points may expire\nover time" {
+  style.stroke: "#FF9800"
+  style.stroke-dash: 4
+}
+
+reward_section.r_end -> redeem_section.user_d.d_start: "user can redeem\nearned points" {
+  style.stroke: "#6A1B9A"
+  style.stroke-dash: 4
+}

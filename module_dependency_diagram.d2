@@ -1,0 +1,144 @@
+direction: down
+
+title: "IamUNSRI — NestJS Module Dependencies" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+core: "Core / Shared" {
+  style.fill: "#FFF9C4"
+  style.stroke: "#F57F17"
+  db: DatabaseModule {style.fill: "#FFF59D"}
+  mail: MailModule {style.fill: "#FFF59D"}
+  firebase: FirebaseModule {style.fill: "#FFF59D"}
+  utils: UtilsModule {style.fill: "#FFF59D"}
+}
+
+auth_domain: "Auth Domain" {
+  style.fill: "#E3F2FD"
+  style.stroke: "#1565C0"
+  auth: AuthModule {style.fill: "#BBDEFB"}
+  users: UsersModule {style.fill: "#BBDEFB"}
+  roles: RolesModule {style.fill: "#BBDEFB"}
+  perms: PermissionsModule {style.fill: "#BBDEFB"}
+  user_roles: UserRolesModule {style.fill: "#BBDEFB"}
+}
+
+identity: "Identity Domain" {
+  style.fill: "#E8F5E9"
+  style.stroke: "#2E7D32"
+  profiles: ProfilesModule {style.fill: "#C8E6C9"}
+  students: StudentsModule {style.fill: "#C8E6C9"}
+  verify: VerificationModule {style.fill: "#C8E6C9"}
+  prof_hist: ProfileHistoriesModule {style.fill: "#C8E6C9"}
+}
+
+career: "Career Domain" {
+  style.fill: "#FFF3E0"
+  style.stroke: "#E65100"
+  companies: CompaniesModule {style.fill: "#FFE0B2"}
+  jobs: JobsModule {style.fill: "#FFE0B2"}
+  job_apps: JobApplicationsModule {style.fill: "#FFE0B2"}
+}
+
+event: "Event Domain" {
+  style.fill: "#F3E5F5"
+  style.stroke: "#6A1B9A"
+  act_types: ActivityTypesModule {style.fill: "#E1BEE7"}
+  activities: ActivitiesModule {style.fill: "#E1BEE7"}
+  act_regs: ActivityRegistrationsModule {style.fill: "#E1BEE7"}
+}
+
+content: "Content Domain" {
+  style.fill: "#E0F7FA"
+  style.stroke: "#00695C"
+  posts: PostsModule {style.fill: "#B2DFDB"}
+  carousels: CarouselsModule {style.fill: "#B2DFDB"}
+  stories: StoriesModule {style.fill: "#B2DFDB"}
+}
+
+reward: "Reward Domain" {
+  style.fill: "#FCE4EC"
+  style.stroke: "#C62828"
+  points: PointsModule {style.fill: "#FFCDD2"}
+  vouchers: VouchersModule {style.fill: "#FFCDD2"}
+}
+
+community: "Community Domain" {
+  style.fill: "#FBE9E7"
+  style.stroke: "#BF360C"
+  ika: IkaModule {style.fill: "#FFCCBC"}
+  connections: ConnectionsModule {style.fill: "#FFCCBC"}
+}
+
+platform: "Platform Domain" {
+  style.fill: "#ECEFF1"
+  style.stroke: "#37474F"
+  sso: SsoModule {style.fill: "#CFD8DC"}
+  config: ConfigurationsModule {style.fill: "#CFD8DC"}
+  public: PublicModule {style.fill: "#CFD8DC"}
+  integration: IntegrationModule {style.fill: "#CFD8DC"}
+  notif: NotificationsModule {style.fill: "#CFD8DC"}
+}
+
+# ── Auth domain deps ──
+auth_domain.auth -> auth_domain.users {style.stroke: "#1565C0"}
+auth_domain.auth -> auth_domain.roles {style.stroke: "#1565C0"}
+auth_domain.auth -> auth_domain.perms {style.stroke: "#1565C0"}
+auth_domain.auth -> core.mail {style.stroke: "#F57F17"}
+auth_domain.users -> auth_domain.roles {style.stroke: "#1565C0"}
+auth_domain.users -> identity.profiles {style.stroke: "#2E7D32"}
+auth_domain.users -> identity.students {style.stroke: "#2E7D32"}
+auth_domain.user_roles -> auth_domain.users {style.stroke: "#1565C0"}
+auth_domain.user_roles -> auth_domain.roles {style.stroke: "#1565C0"}
+
+# ── Identity deps ──
+identity.verify -> auth_domain.users {style.stroke: "#1565C0"}
+identity.verify -> identity.profiles {style.stroke: "#2E7D32"}
+identity.verify -> core.mail {style.stroke: "#F57F17"}
+identity.verify -> core.firebase {style.stroke: "#F57F17"}
+identity.prof_hist -> identity.profiles {style.stroke: "#2E7D32"}
+
+# ── Career deps ──
+career.jobs -> career.companies {style.stroke: "#E65100"}
+career.jobs -> auth_domain.users {style.stroke: "#1565C0"}
+career.job_apps -> career.jobs {style.stroke: "#E65100"}
+career.job_apps -> auth_domain.users {style.stroke: "#1565C0"}
+career.job_apps -> identity.prof_hist {style.stroke: "#2E7D32"}
+career.job_apps -> platform.notif {style.stroke: "#37474F"}
+
+# ── Event deps ──
+event.activities -> event.act_types {style.stroke: "#6A1B9A"}
+event.act_regs -> event.activities {style.stroke: "#6A1B9A"}
+event.act_regs -> auth_domain.users {style.stroke: "#1565C0"}
+event.act_regs -> identity.prof_hist {style.stroke: "#2E7D32"}
+event.act_regs -> reward.points {style.stroke: "#C62828"}
+
+# ── Reward deps ──
+reward.points -> auth_domain.users {style.stroke: "#1565C0"}
+reward.points -> reward.vouchers {style.stroke: "#C62828"}
+
+# ── Community deps ──
+community.ika -> auth_domain.users {style.stroke: "#1565C0"}
+community.ika -> identity.profiles {style.stroke: "#2E7D32"}
+community.ika -> core.mail {style.stroke: "#F57F17"}
+community.connections -> auth_domain.users {style.stroke: "#1565C0"}
+
+# ── Platform deps ──
+platform.sso -> auth_domain.users {style.stroke: "#1565C0"}
+platform.sso -> auth_domain.auth {style.stroke: "#1565C0"}
+platform.public -> career.jobs {style.stroke: "#E65100"}
+platform.public -> event.activities {style.stroke: "#6A1B9A"}
+platform.public -> content.posts {style.stroke: "#00695C"}
+platform.public -> content.carousels {style.stroke: "#00695C"}
+platform.public -> platform.config {style.stroke: "#37474F"}
+platform.integration -> career.jobs {style.stroke: "#E65100"}
+platform.integration -> event.activities {style.stroke: "#6A1B9A"}
+platform.integration -> content.posts {style.stroke: "#00695C"}
+platform.notif -> auth_domain.users {style.stroke: "#1565C0"}
+platform.notif -> core.firebase {style.stroke: "#F57F17"}
+
+# ── Content deps ──
+content.posts -> auth_domain.users {style.stroke: "#1565C0"}
+content.stories -> auth_domain.users {style.stroke: "#1565C0"}

@@ -1,0 +1,200 @@
+direction: down
+
+title: "Login & Authentication Flow" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+# ── Actors / Lanes ──
+client: "🖥️ Client (Web / Mobile)" {
+  style.fill: "#E3F2FD"
+  style.stroke: "#1565C0"
+  style.border-radius: 12
+}
+
+backend: "⚙️ Backend API" {
+  style.fill: "#FFF3E0"
+  style.stroke: "#E65100"
+  style.border-radius: 12
+}
+
+db: "💾 Database" {
+  style.fill: "#E8F5E9"
+  style.stroke: "#2E7D32"
+  style.border-radius: 12
+}
+
+# ── Flow Nodes ──
+start: "" {
+  shape: circle
+  style.fill: "#263238"
+  width: 30
+  height: 30
+}
+
+c1: "User membuka\nhalaman Login" {
+  shape: rectangle
+  style.fill: "#BBDEFB"
+  style.stroke: "#1565C0"
+  style.border-radius: 8
+}
+
+c2: "Input email\n& password" {
+  shape: rectangle
+  style.fill: "#BBDEFB"
+  style.stroke: "#1565C0"
+  style.border-radius: 8
+}
+
+c3: "Submit form login" {
+  shape: rectangle
+  style.fill: "#BBDEFB"
+  style.stroke: "#1565C0"
+  style.border-radius: 8
+}
+
+b1: "Receive\nPOST /auth/login" {
+  shape: rectangle
+  style.fill: "#FFE0B2"
+  style.stroke: "#E65100"
+  style.border-radius: 8
+}
+
+b2: "LocalAuthGuard\ntriggered" {
+  shape: rectangle
+  style.fill: "#FFE0B2"
+  style.stroke: "#E65100"
+  style.border-radius: 8
+}
+
+b3: "Validate request\n(LoginDto)" {
+  shape: rectangle
+  style.fill: "#FFE0B2"
+  style.stroke: "#E65100"
+  style.border-radius: 8
+}
+
+d1: "Email & password\nvalid?" {
+  shape: diamond
+  style.fill: "#E8EAF6"
+  style.stroke: "#5C6BC0"
+}
+
+db1: "Query user\nby email" {
+  shape: rectangle
+  style.fill: "#C8E6C9"
+  style.stroke: "#2E7D32"
+  style.border-radius: 8
+}
+
+b4: "bcrypt.compare\n(password, hash)" {
+  shape: rectangle
+  style.fill: "#FFE0B2"
+  style.stroke: "#E65100"
+  style.border-radius: 8
+}
+
+d2: "Password\nmatch?" {
+  shape: diamond
+  style.fill: "#E8EAF6"
+  style.stroke: "#5C6BC0"
+}
+
+b5: "Generate JWT\naccess_token" {
+  shape: rectangle
+  style.fill: "#FFE0B2"
+  style.stroke: "#E65100"
+  style.border-radius: 8
+}
+
+b6: "Generate\nrefresh_token" {
+  shape: rectangle
+  style.fill: "#FFE0B2"
+  style.stroke: "#E65100"
+  style.border-radius: 8
+}
+
+b7: "Return tokens\n+ user data" {
+  shape: rectangle
+  style.fill: "#FFE0B2"
+  style.stroke: "#E65100"
+  style.border-radius: 8
+}
+
+c4: "Simpan tokens\ndi storage" {
+  shape: rectangle
+  style.fill: "#BBDEFB"
+  style.stroke: "#1565C0"
+  style.border-radius: 8
+}
+
+c5: "Redirect ke\nDashboard" {
+  shape: rectangle
+  style.fill: "#BBDEFB"
+  style.stroke: "#1565C0"
+  style.border-radius: 8
+}
+
+err1: "Return 400\nValidation error" {
+  shape: rectangle
+  style.fill: "#FFCDD2"
+  style.stroke: "#C62828"
+  style.border-radius: 8
+}
+
+err2: "Return 401\nInvalid credentials" {
+  shape: rectangle
+  style.fill: "#FFCDD2"
+  style.stroke: "#C62828"
+  style.border-radius: 8
+}
+
+c_err: "Tampilkan\nerror message" {
+  shape: rectangle
+  style.fill: "#FFCDD2"
+  style.stroke: "#C62828"
+  style.border-radius: 8
+}
+
+end_ok: "" {
+  shape: circle
+  style.fill: "#2E7D32"
+  width: 30
+  height: 30
+}
+
+end_err: "" {
+  shape: circle
+  style.fill: "#C62828"
+  width: 30
+  height: 30
+}
+
+# ── Connections ──
+start -> c1
+c1 -> c2
+c2 -> c3
+c3 -> b1: "HTTPS" {style.stroke: "#1565C0"}
+b1 -> b2
+b2 -> b3
+b3 -> d1
+
+d1 -> db1: "ya" {style.stroke: "#2E7D32"}
+d1 -> err1: "tidak" {style.stroke: "#C62828"}
+
+db1 -> b4
+b4 -> d2
+
+d2 -> b5: "ya" {style.stroke: "#2E7D32"}
+d2 -> err2: "tidak" {style.stroke: "#C62828"}
+
+b5 -> b6
+b6 -> b7
+b7 -> c4
+c4 -> c5
+c5 -> end_ok
+
+err1 -> c_err
+err2 -> c_err
+c_err -> end_err

@@ -1,0 +1,152 @@
+direction: down
+
+title: "IamUNSRI ERD — Core User & Auth" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+roles: Roles {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  name: varchar {constraint: unique}
+  created_at: datetime
+  updated_at: datetime
+}
+
+permissions: Permissions {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  slug: varchar {constraint: unique}
+  description: text
+}
+
+role_permissions: Role_Permissions {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  role_id: int {constraint: foreign_key}
+  permission_id: int {constraint: foreign_key}
+}
+
+users: Users {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  full_name: varchar
+  email: varchar
+  password: varchar
+  phone_number: varchar
+  address: text
+  password_reset_token: varchar
+  password_reset_expires: datetime
+  is_verified: boolean
+  photo_url: varchar
+  fcm_token: varchar
+  points: int
+  role: varchar
+  actor_type: enum
+  role_id: int {constraint: foreign_key}
+  created_at: datetime
+  updated_at: datetime
+}
+
+profiles: Profiles {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: [foreign_key; unique]}
+  nim: varchar {constraint: unique}
+  nik: varchar {constraint: unique}
+  simak_registrasi_id: varchar {constraint: unique}
+  major: varchar
+  faculty: varchar
+  graduation_year: int
+  membership_status: varchar
+  academic_fields: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+students: Students {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: [foreign_key; unique]}
+  student_fields: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+profile_histories: Profile_Histories {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  profile_id: int {constraint: foreign_key}
+  snapshot: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+verification_codes: Verification_Codes {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: [foreign_key; unique]}
+  code: varchar
+  target_email: varchar
+  expires_at: datetime
+  created_at: datetime
+  updated_at: datetime
+}
+
+student_verifications: Student_Verifications {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  method: enum
+  status: enum
+  evidence: varchar
+  reviewed_by: int {constraint: foreign_key}
+  admin_notes: text
+  created_at: datetime
+  updated_at: datetime
+}
+
+document_verifications: Document_Verifications {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  status: enum
+  document_path: varchar
+  document_type: varchar
+  reviewed_by: int {constraint: foreign_key}
+  admin_notes: text
+  created_at: datetime
+  updated_at: datetime
+}
+
+notifications: Notifications {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  title: varchar
+  message: text
+  is_read: boolean
+  created_at: datetime
+  updated_at: datetime
+}
+
+# Relationships
+roles -> role_permissions: "1..*" {style.stroke: "#1565C0"}
+permissions -> role_permissions: "1..*" {style.stroke: "#1565C0"}
+roles -> users: "1..*" {style.stroke: "#2E7D32"}
+users -> profiles: "1..1" {style.stroke: "#E65100"}
+users -> students: "1..1" {style.stroke: "#E65100"}
+profiles -> profile_histories: "1..*" {style.stroke: "#6A1B9A"}
+users -> verification_codes: "1..1 active" {style.stroke: "#C62828"}
+users -> student_verifications: "1..*" {style.stroke: "#C62828"}
+users -> document_verifications: "1..*" {style.stroke: "#C62828"}
+users -> notifications: "1..*" {style.stroke: "#00695C"}
+users -> student_verifications.reviewed_by: "reviewer" {
+  style.stroke: "#9E9E9E"
+  style.stroke-dash: 3
+}
+users -> document_verifications.reviewed_by: "reviewer" {
+  style.stroke: "#9E9E9E"
+  style.stroke-dash: 3
+}

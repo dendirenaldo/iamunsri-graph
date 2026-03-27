@@ -1,0 +1,69 @@
+direction: down
+
+title: "IamUNSRI ERD — Event & Activity Domain" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+users: Users {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  full_name: varchar
+}
+
+activity_types: Activity_Types {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  name: varchar
+  created_at: datetime
+  updated_at: datetime
+}
+
+activities: Activities {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  activity_type_id: int {constraint: foreign_key}
+  title: varchar
+  description: text
+  event_status: enum
+  registration_type: enum
+  quota: int
+  start_date: datetime
+  end_date: datetime
+  location: varchar
+  contact_person: varchar
+  speakers: json
+  benefits: json
+  reward_points: int
+  is_sync_disabled: boolean
+  created_at: datetime
+  updated_at: datetime
+}
+
+activity_registrations: Activity_Registrations {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  activity_id: int {constraint: foreign_key}
+  user_id: int {constraint: foreign_key}
+  profile_history_id: int {constraint: foreign_key}
+  status: varchar
+  created_at: datetime
+  updated_at: datetime
+}
+
+profile_histories: Profile_Histories {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  profile_id: int {constraint: foreign_key}
+  snapshot: json
+}
+
+# Relationships
+activity_types -> activities: "1..*" {style.stroke: "#6A1B9A"}
+activities -> activity_registrations: "1..*" {style.stroke: "#E65100"}
+users -> activity_registrations: "registers 1..*" {style.stroke: "#2E7D32"}
+profile_histories -> activity_registrations: "snapshot ref" {
+  style.stroke: "#607D8B"
+  style.stroke-dash: 3
+}

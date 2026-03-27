@@ -1,0 +1,123 @@
+@startuml
+skinparam backgroundColor #FAFBFD
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam linetype ortho
+skinparam roundCorner 12
+
+skinparam actor {
+  BackgroundColor #E8EAF6
+  BorderColor #5C6BC0
+  FontColor #283593
+  FontSize 13
+  Style awesome
+}
+
+skinparam usecase {
+  BackgroundColor #F5F5F5
+  BorderColor #90A4AE
+  FontColor #37474F
+  BorderThickness 1.2
+  FontSize 11
+}
+
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #B0BEC5
+  FontColor #263238
+  FontSize 14
+  FontStyle bold
+  BorderThickness 1.5
+  RoundCorner 16
+}
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #CFD8DC
+  FontColor #455A64
+  FontSize 13
+  FontStyle bold
+  BorderThickness 1
+  Style rectangle
+}
+
+skinparam arrow {
+  Color #78909C
+  FontColor #546E7A
+  FontSize 10
+  Thickness 1.2
+}
+
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #FFD54F
+  FontColor #5D4037
+  FontSize 10
+}
+
+left to right direction
+
+actor "Perusahaan" as COMPANY
+
+rectangle "IamUNSRI — Perusahaan Domain" {
+
+  package "Autentikasi" {
+    usecase "Login" as UC_LOGIN
+    usecase "Change Password" as UC_CHANGE_PW
+    usecase "Logout" as UC_LOGOUT
+  }
+
+  package "Profil Perusahaan" {
+    usecase "Lihat Profil Perusahaan" as UC_COMP_VIEW
+    usecase "Edit Profil Perusahaan" as UC_COMP_EDIT
+  }
+
+  package "Kelola Lowongan" {
+    usecase "Lihat Lowongan Saya" as UC_JOB_LIST
+    usecase "Tambah Lowongan" as UC_JOB_CREATE
+    usecase "Edit Lowongan" as UC_JOB_EDIT
+    usecase "Hapus Lowongan" as UC_JOB_DELETE
+  }
+
+  package "Kelola Pelamar" {
+    usecase "Lihat Semua Lamaran" as UC_APP_LIST
+    usecase "Lihat Detail Lamaran" as UC_APP_DETAIL
+    usecase "Lihat Pelamar\nper Lowongan" as UC_APP_PER_JOB
+    usecase "Update Status Lamaran" as UC_APP_STATUS
+  }
+
+  package "Utilitas" {
+    usecase "Upload File" as UC_UPLOAD
+  }
+}
+
+COMPANY --> UC_LOGIN
+COMPANY --> UC_CHANGE_PW
+COMPANY --> UC_LOGOUT
+
+COMPANY --> UC_COMP_VIEW
+COMPANY --> UC_COMP_EDIT
+
+COMPANY --> UC_JOB_LIST
+COMPANY --> UC_JOB_CREATE
+COMPANY --> UC_JOB_EDIT
+COMPANY --> UC_JOB_DELETE
+
+COMPANY --> UC_APP_LIST
+COMPANY --> UC_APP_DETAIL
+COMPANY --> UC_APP_PER_JOB
+COMPANY --> UC_APP_STATUS
+
+COMPANY --> UC_UPLOAD
+
+UC_APP_STATUS ..> UC_APP_DETAIL : <<extends>>
+UC_APP_DETAIL ..> UC_APP_PER_JOB : <<extends>>
+
+note right of UC_APP_STATUS
+  Perusahaan hanya bisa
+  mengelola pelamar dari
+  lowongan miliknya sendiri
+end note
+
+@enduml

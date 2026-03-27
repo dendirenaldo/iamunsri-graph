@@ -1,0 +1,124 @@
+direction: down
+
+title: "SSO Authorization Code Flow" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+start: "" {shape: circle; style.fill: "#263238"; width: 30; height: 30}
+
+# ── SSO Client App ──
+sso1: "User klik\n'Login with IamUNSRI'\ndi external app" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+sso2: "Redirect ke IamUNSRI\n/sso/authorize?client_id=X\n&redirect_uri=Y" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+
+# ── User / IamUNSRI ──
+u1: "Halaman SSO\nAuthorize terbuka" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u2: "GET /sso/client/:clientId" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+db1: "Query sso_clients\nby client_id" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+
+d_client: "Client\nvalid?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_login: "User sudah\nlogin?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_approve: "User\napprove?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_redirect: "Redirect URI\nvalid?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+d_code: "Code valid &\nbelum expired?" {shape: diamond; style.fill: "#E8EAF6"; style.stroke: "#5C6BC0"}
+
+u3: "Tampilkan info\nclient app" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+u4: "Tampilkan tombol\nApprove / Deny" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+b1: "POST /sso/approve\n{client_id, redirect_uri}" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+b2: "JwtAuthGuard\nValidate redirect_uri" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+b3: "Generate auth_code\n(random, short-lived)" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+db2: "Simpan sso_auth_codes\ncode, client_id, user_id\nexpires_at (5 min)" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+
+u5: "Redirect ke\nredirect_uri?code=CODE" {style.fill: "#BBDEFB"; style.stroke: "#1565C0"; style.border-radius: 8}
+
+# ── Token Exchange ──
+token_exchange: "🔄 Token Exchange" {
+  style.fill: "#F8F9FA"
+  style.stroke: "#CFD8DC"
+  style.border-radius: 12
+
+  t1: "Client app receive\ncallback + auth_code" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  t2: "POST /sso/token\n{grant_type, code,\nclient_id, client_secret}" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t3: "Validate\nclient_secret" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t4: "Query sso_auth_codes\nby code" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  t5: "Generate SSO\naccess_token" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  t6: "Simpan sso_access_tokens\nHapus auth_code (used)" {style.fill: "#C8E6C9"; style.stroke: "#2E7D32"; style.border-radius: 8}
+  t7: "Return access_token" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+
+  t1 -> t2
+  t2 -> t3
+  t3 -> t4
+  t4 -> t5
+  t5 -> t6
+  t6 -> t7
+}
+
+# ── UserInfo ──
+userinfo: "👤 UserInfo" {
+  style.fill: "#F8F9FA"
+  style.stroke: "#CFD8DC"
+  style.border-radius: 12
+
+  ui1: "GET /sso/userinfo\nBearer TOKEN" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+  ui2: "SsoAuthGuard\nQuery user by token" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  ui3: "Return user claims\n(id, name, email, nim)" {style.fill: "#FFE0B2"; style.stroke: "#E65100"; style.border-radius: 8}
+  ui4: "Login user di\nclient app" {style.fill: "#E1BEE7"; style.stroke: "#6A1B9A"; style.border-radius: 8}
+
+  ui1 -> ui2
+  ui2 -> ui3
+  ui3 -> ui4
+}
+
+err_client: "❌ 404 Client\ntidak dikenal" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_redirect: "❌ 400 Invalid\nredirect_uri" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_denied: "Redirect ke\nredirect_uri\n?error=access_denied" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_code: "❌ 401 Code\ninvalid/expired" {style.fill: "#FFCDD2"; style.stroke: "#C62828"; style.border-radius: 8}
+err_login: "Redirect ke login\ndengan return_url SSO" {style.fill: "#FFF9C4"; style.stroke: "#F57F17"; style.border-radius: 8}
+
+end_ok: "" {shape: circle; style.fill: "#2E7D32"; width: 30; height: 30}
+end_err: "" {shape: circle; style.fill: "#C62828"; width: 30; height: 30}
+
+# ── Connections ──
+start -> sso1
+sso1 -> sso2
+sso2 -> u1
+u1 -> u2
+u2 -> db1
+db1 -> d_client
+
+d_client -> u3: "ya" {style.stroke: "#2E7D32"}
+d_client -> err_client: "tidak" {style.stroke: "#C62828"}
+
+u3 -> d_login
+d_login -> u4: "ya" {style.stroke: "#2E7D32"}
+d_login -> err_login: "belum" {style.stroke: "#FF9800"}
+
+u4 -> d_approve
+d_approve -> b1: "approve" {style.stroke: "#2E7D32"}
+d_approve -> err_denied: "deny" {style.stroke: "#C62828"}
+
+b1 -> b2
+b2 -> d_redirect
+d_redirect -> b3: "ya" {style.stroke: "#2E7D32"}
+d_redirect -> err_redirect: "tidak" {style.stroke: "#C62828"}
+
+b3 -> db2
+db2 -> u5
+u5 -> token_exchange.t1
+
+token_exchange.t4 -> d_code
+d_code -> token_exchange.t5: "ya" {style.stroke: "#2E7D32"}
+d_code -> err_code: "tidak" {style.stroke: "#C62828"}
+
+token_exchange.t7 -> userinfo.ui1
+userinfo.ui4 -> end_ok
+
+err_client -> end_err
+err_redirect -> end_err
+err_denied -> end_err
+err_code -> end_err
+err_login -> end_err

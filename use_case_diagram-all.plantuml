@@ -1,0 +1,221 @@
+@startuml
+skinparam backgroundColor #FAFBFD
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam shadowing false
+skinparam linetype ortho
+skinparam roundCorner 12
+skinparam nodesep 18
+skinparam ranksep 25
+
+skinparam actor {
+  BackgroundColor #E8EAF6
+  BorderColor #5C6BC0
+  FontColor #283593
+  FontSize 12
+  Style awesome
+}
+
+skinparam usecase {
+  BackgroundColor #F5F5F5
+  BorderColor #90A4AE
+  FontColor #37474F
+  BorderThickness 1.2
+  FontSize 10
+}
+
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #B0BEC5
+  FontColor #263238
+  FontSize 13
+  FontStyle bold
+  BorderThickness 1.5
+  RoundCorner 16
+}
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #CFD8DC
+  FontColor #455A64
+  FontSize 12
+  FontStyle bold
+  BorderThickness 1
+  Style rectangle
+}
+
+skinparam arrow {
+  Color #78909C
+  FontColor #546E7A
+  FontSize 9
+  Thickness 1.1
+}
+
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #FFD54F
+  FontColor #5D4037
+  FontSize 9
+}
+
+left to right direction
+
+actor "Mahasiswa /\nAlumni" as USER
+actor "Admin" as ADMIN
+actor "Perusahaan" as COMPANY
+actor "SSO Client\nApp" as SSO_APP
+actor "Cron\nScheduler" as CRON
+
+rectangle "IamUNSRI Platform" {
+
+  package "Autentikasi & Identitas" {
+    usecase "Login" as UC_LOGIN
+    usecase "Register" as UC_REGISTER
+    usecase "Reset Password" as UC_RESET
+    usecase "Change Password" as UC_CHANGE
+    usecase "Kelola Profil" as UC_PROFILE
+    usecase "Verifikasi Identitas" as UC_VERIFY_SELF
+    usecase "Review Verifikasi" as UC_VERIFY_ADMIN
+  }
+
+  package "RBAC" {
+    usecase "Kelola Roles" as UC_ROLES
+    usecase "Kelola Permissions" as UC_PERMS
+  }
+
+  package "Manajemen User" {
+    usecase "CRUD Users" as UC_USER_CRUD
+    usecase "Reset Password\nUser" as UC_USER_RESET
+  }
+
+  package "Lowongan Kerja" {
+    usecase "Browse Lowongan" as UC_JOB_BROWSE
+    usecase "Apply Lowongan" as UC_JOB_APPLY
+    usecase "Riwayat Lamaran" as UC_JOB_HIST
+    usecase "Kelola Lowongan" as UC_JOB_MANAGE
+    usecase "Review Pelamar" as UC_JOB_REVIEW
+  }
+
+  package "Kegiatan" {
+    usecase "Browse Kegiatan" as UC_ACT_BROWSE
+    usecase "Daftar Kegiatan" as UC_ACT_REG
+    usecase "Riwayat Kegiatan" as UC_ACT_HIST
+    usecase "Kelola Kegiatan" as UC_ACT_MANAGE
+    usecase "Review Peserta" as UC_ACT_REVIEW
+  }
+
+  package "Poin & Voucher" {
+    usecase "Lihat Poin" as UC_POINT
+    usecase "Redeem Voucher" as UC_REDEEM
+    usecase "Kelola Voucher" as UC_VOUCHER_MANAGE
+  }
+
+  package "IKA & Komunitas" {
+    usecase "Daftar IKA" as UC_IKA
+    usecase "Kartu Digital" as UC_IKA_CARD
+    usecase "Donasi" as UC_DONATE
+    usecase "Kelola Koneksi" as UC_CONN
+    usecase "Import Alumni" as UC_IKA_IMPORT
+  }
+
+  package "Konten" {
+    usecase "Lihat Konten Publik" as UC_CONTENT_VIEW
+    usecase "Kelola Post" as UC_POST_MANAGE
+    usecase "Kelola Carousel" as UC_CAROUSEL_MANAGE
+  }
+
+  package "SSO" {
+    usecase "SSO Authorize" as UC_SSO_AUTH
+    usecase "SSO Token Exchange" as UC_SSO_TOKEN
+    usecase "SSO UserInfo" as UC_SSO_INFO
+  }
+
+  package "Integrasi & Sistem" {
+    usecase "Sync SIMAK" as UC_SYNC_SIMAK
+    usecase "Sync Alumni API" as UC_SYNC_ALUMNI
+    usecase "Expire Points" as UC_EXPIRE
+    usecase "Kelola Konfigurasi" as UC_CONFIG
+    usecase "Cek Versi App" as UC_VERSION
+  }
+}
+
+' ── USER ──
+USER --> UC_LOGIN
+USER --> UC_REGISTER
+USER --> UC_RESET
+USER --> UC_CHANGE
+USER --> UC_PROFILE
+USER --> UC_VERIFY_SELF
+USER --> UC_JOB_BROWSE
+USER --> UC_JOB_APPLY
+USER --> UC_JOB_HIST
+USER --> UC_ACT_BROWSE
+USER --> UC_ACT_REG
+USER --> UC_ACT_HIST
+USER --> UC_POINT
+USER --> UC_REDEEM
+USER --> UC_IKA
+USER --> UC_IKA_CARD
+USER --> UC_DONATE
+USER --> UC_CONN
+USER --> UC_CONTENT_VIEW
+USER --> UC_SSO_AUTH
+USER --> UC_VERSION
+
+' ── ADMIN ──
+ADMIN --> UC_LOGIN
+ADMIN --> UC_VERIFY_ADMIN
+ADMIN --> UC_ROLES
+ADMIN --> UC_PERMS
+ADMIN --> UC_USER_CRUD
+ADMIN --> UC_USER_RESET
+ADMIN --> UC_JOB_MANAGE
+ADMIN --> UC_JOB_REVIEW
+ADMIN --> UC_ACT_MANAGE
+ADMIN --> UC_ACT_REVIEW
+ADMIN --> UC_VOUCHER_MANAGE
+ADMIN --> UC_IKA_IMPORT
+ADMIN --> UC_POST_MANAGE
+ADMIN --> UC_CAROUSEL_MANAGE
+ADMIN --> UC_SYNC_SIMAK
+ADMIN --> UC_SYNC_ALUMNI
+ADMIN --> UC_CONFIG
+
+' ── COMPANY ──
+COMPANY --> UC_LOGIN
+COMPANY --> UC_CHANGE
+COMPANY --> UC_JOB_MANAGE
+COMPANY --> UC_JOB_REVIEW
+
+' ── SSO APP ──
+SSO_APP --> UC_SSO_TOKEN
+SSO_APP --> UC_SSO_INFO
+
+' ── CRON ──
+CRON --> UC_SYNC_SIMAK
+CRON --> UC_SYNC_ALUMNI
+CRON --> UC_EXPIRE
+
+' ── Relationships ──
+UC_JOB_APPLY ..> UC_JOB_BROWSE : <<extends>>
+UC_ACT_REG ..> UC_ACT_BROWSE : <<extends>>
+UC_REDEEM ..> UC_POINT : <<extends>>
+UC_SSO_TOKEN ..> UC_SSO_AUTH : <<include>>
+UC_SSO_INFO ..> UC_SSO_TOKEN : <<include>>
+UC_IKA_CARD ..> UC_IKA : <<extends>>
+UC_DONATE ..> UC_IKA : <<extends>>
+
+note bottom of UC_JOB_APPLY
+  Requires: verified user
+end note
+
+note bottom of UC_ACT_REG
+  Requires: verified user
+end note
+
+note bottom of UC_REDEEM
+  Requires: verified user
+  + sufficient points
+end note
+
+@enduml

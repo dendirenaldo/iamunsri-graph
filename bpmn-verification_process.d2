@@ -1,0 +1,286 @@
+direction: right
+
+title: "BPMN — Verification Process" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+user_lane: "👤 User (Mahasiswa / Alumni)" {
+  style.fill: "#E3F2FD"
+  style.stroke: "#1565C0"
+  style.border-radius: 12
+
+  start: "" {shape: circle; style.fill: "#263238"; width: 24; height: 24}
+
+  t1: "Login ke\nplatform" {
+    shape: rectangle
+    style.fill: "#BBDEFB"
+    style.stroke: "#1565C0"
+    style.border-radius: 8
+  }
+
+  t2: "Buka menu\nVerifikasi" {
+    shape: rectangle
+    style.fill: "#BBDEFB"
+    style.stroke: "#1565C0"
+    style.border-radius: 8
+  }
+
+  gw1: "Pilih\nmetode" {
+    shape: diamond
+    style.fill: "#E8EAF6"
+    style.stroke: "#5C6BC0"
+  }
+
+  t3: "Input email\nkampus" {
+    shape: rectangle
+    style.fill: "#BBDEFB"
+    style.stroke: "#1565C0"
+    style.border-radius: 8
+  }
+
+  t4: "Upload\ndokumen" {
+    shape: rectangle
+    style.fill: "#BBDEFB"
+    style.stroke: "#1565C0"
+    style.border-radius: 8
+  }
+
+  t5: "Input kode\nverifikasi" {
+    shape: rectangle
+    style.fill: "#BBDEFB"
+    style.stroke: "#1565C0"
+    style.border-radius: 8
+  }
+
+  ev_notif: "📩 Terima\nnotifikasi\nhasil" {
+    shape: circle
+    style.fill: "#FFF9C4"
+    style.stroke: "#F57F17"
+    width: 60
+    height: 60
+  }
+
+  start -> t1
+  t1 -> t2
+  t2 -> gw1
+  gw1 -> t3: "Email" {style.stroke: "#1565C0"}
+  gw1 -> t4: "Dokumen" {style.stroke: "#E65100"}
+}
+
+system_lane: "⚙️ System (Backend)" {
+  style.fill: "#FFF3E0"
+  style.stroke: "#E65100"
+  style.border-radius: 12
+
+  t6: "Validate\ndomain email" {
+    shape: rectangle
+    style.fill: "#FFE0B2"
+    style.stroke: "#E65100"
+    style.border-radius: 8
+  }
+
+  t7: "Generate\nkode OTP" {
+    shape: rectangle
+    style.fill: "#FFE0B2"
+    style.stroke: "#E65100"
+    style.border-radius: 8
+  }
+
+  t8: "Validate\nfile upload" {
+    shape: rectangle
+    style.fill: "#FFE0B2"
+    style.stroke: "#E65100"
+    style.border-radius: 8
+  }
+
+  t9: "Verify kode\n& check expiry" {
+    shape: rectangle
+    style.fill: "#FFE0B2"
+    style.stroke: "#E65100"
+    style.border-radius: 8
+  }
+
+  t10: "Query\nSIMAK API" {
+    shape: rectangle
+    style.fill: "#FFE0B2"
+    style.stroke: "#E65100"
+    style.border-radius: 8
+  }
+
+  gw2: "SIMAK\ncocok?" {
+    shape: diamond
+    style.fill: "#E8EAF6"
+    style.stroke: "#5C6BC0"
+  }
+
+  t11: "Auto verify\nuser" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+
+  t12: "Buat request\nstatus = pending" {
+    shape: rectangle
+    style.fill: "#FFF9C4"
+    style.stroke: "#F57F17"
+    style.border-radius: 8
+  }
+
+  t6 -> t7
+  t7 -> t9
+  t9 -> t10
+  t10 -> gw2
+  gw2 -> t11: "ya" {style.stroke: "#2E7D32"}
+  gw2 -> t12: "tidak" {style.stroke: "#FF9800"}
+}
+
+smtp_lane: "📧 Email Service" {
+  style.fill: "#FCE4EC"
+  style.stroke: "#C62828"
+  style.border-radius: 12
+
+  t_send: "Kirim email\nkode OTP" {
+    shape: rectangle
+    style.fill: "#FFCDD2"
+    style.stroke: "#C62828"
+    style.border-radius: 8
+  }
+}
+
+admin_lane: "👨‍💼 Admin" {
+  style.fill: "#F3E5F5"
+  style.stroke: "#6A1B9A"
+  style.border-radius: 12
+
+  t13: "Review antrian\nverifikasi" {
+    shape: rectangle
+    style.fill: "#E1BEE7"
+    style.stroke: "#6A1B9A"
+    style.border-radius: 8
+  }
+
+  t14: "Review data /\ndokumen" {
+    shape: rectangle
+    style.fill: "#E1BEE7"
+    style.stroke: "#6A1B9A"
+    style.border-radius: 8
+  }
+
+  gw3: "Keputusan?" {
+    shape: diamond
+    style.fill: "#E8EAF6"
+    style.stroke: "#5C6BC0"
+  }
+
+  t15: "Approve\nstatus = approved\nis_verified = true" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+
+  t16: "Reject\nstatus = rejected\nsimpan notes" {
+    shape: rectangle
+    style.fill: "#FFCDD2"
+    style.stroke: "#C62828"
+    style.border-radius: 8
+  }
+
+  t13 -> t14
+  t14 -> gw3
+  gw3 -> t15: "approve" {style.stroke: "#2E7D32"}
+  gw3 -> t16: "reject" {style.stroke: "#C62828"}
+}
+
+db_lane: "💾 Database" {
+  style.fill: "#E8F5E9"
+  style.stroke: "#2E7D32"
+  style.border-radius: 12
+
+  t_save_code: "Simpan\nverification_codes" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+
+  t_save_doc: "Simpan\ndocument_verifications\nstatus = pending" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+
+  t_update_verified: "Update user\nis_verified = true\nupdate profile" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+
+  t_save_pending: "Simpan\nstudent_verifications\nstatus = pending" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+
+  t_update_approve: "Update status\n= approved" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+
+  t_update_reject: "Update status\n= rejected" {
+    shape: rectangle
+    style.fill: "#C8E6C9"
+    style.stroke: "#2E7D32"
+    style.border-radius: 8
+  }
+}
+
+end_verified: "✅ Terverifikasi" {
+  shape: circle
+  style.fill: "#2E7D32"
+  style.font-color: "#FFFFFF"
+  width: 50
+  height: 50
+}
+
+end_rejected: "❌ Ditolak" {
+  shape: circle
+  style.fill: "#C62828"
+  style.font-color: "#FFFFFF"
+  width: 50
+  height: 50
+}
+
+# ── Cross-lane connections ──
+user_lane.t3 -> system_lane.t6 {style.stroke: "#1565C0"}
+system_lane.t7 -> db_lane.t_save_code {style.stroke: "#2E7D32"}
+db_lane.t_save_code -> smtp_lane.t_send {style.stroke: "#C62828"}
+smtp_lane.t_send -> user_lane.t5 {style.stroke: "#1565C0"}
+user_lane.t5 -> system_lane.t9 {style.stroke: "#E65100"}
+
+user_lane.t4 -> system_lane.t8 {style.stroke: "#E65100"}
+system_lane.t8 -> db_lane.t_save_doc {style.stroke: "#2E7D32"}
+db_lane.t_save_doc -> admin_lane.t13 {style.stroke: "#6A1B9A"}
+
+system_lane.t11 -> db_lane.t_update_verified {style.stroke: "#2E7D32"}
+db_lane.t_update_verified -> end_verified {style.stroke: "#2E7D32"}
+
+system_lane.t12 -> db_lane.t_save_pending {style.stroke: "#F57F17"}
+db_lane.t_save_pending -> admin_lane.t13 {style.stroke: "#6A1B9A"}
+
+admin_lane.t15 -> db_lane.t_update_approve {style.stroke: "#2E7D32"}
+admin_lane.t16 -> db_lane.t_update_reject {style.stroke: "#C62828"}
+
+db_lane.t_update_approve -> user_lane.ev_notif {style.stroke: "#2E7D32"}
+db_lane.t_update_reject -> user_lane.ev_notif {style.stroke: "#C62828"}
+
+user_lane.ev_notif -> end_verified: "approved" {style.stroke: "#2E7D32"}
+user_lane.ev_notif -> end_rejected: "rejected" {style.stroke: "#C62828"}

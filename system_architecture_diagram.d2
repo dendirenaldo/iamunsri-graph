@@ -1,0 +1,162 @@
+direction: right
+
+title: "IamUNSRI — System Architecture" {
+  near: top-center
+  style.font-size: 28
+  style.bold: true
+}
+
+clients: Client Layer {
+  style.fill: "#E3F2FD"
+  style.stroke: "#1565C0"
+
+  web: "Frontend Web\nNext.js 13\nPages Router\nBootstrap + Ant Design" {
+    shape: rectangle
+    style.fill: "#BBDEFB"
+    style.font-size: 13
+  }
+
+  mobile: "Mobile App\nFlutter\nProvider State\nSharedPreferences" {
+    shape: rectangle
+    style.fill: "#BBDEFB"
+    style.font-size: 13
+  }
+}
+
+backend: Backend Layer {
+  style.fill: "#FFF3E0"
+  style.stroke: "#E65100"
+
+  api: "NestJS API Server\nREST + Swagger\nPassport JWT" {
+    shape: rectangle
+    style.fill: "#FFE0B2"
+    style.font-size: 13
+  }
+
+  guards: Guards & Middleware {
+    style.fill: "#FFF8E1"
+    jwt: JwtAuthGuard
+    perm: PermissionsGuard
+    verified: VerifiedUserGuard
+    local: LocalAuthGuard
+    sso: SsoAuthGuard
+  }
+
+  modules: Domain Modules {
+    style.fill: "#FFF8E1"
+    auth: Auth
+    users: Users
+    profiles: Profiles
+    verify: Verification
+    jobs: Jobs
+    job_apps: JobApps
+    activities: Activities
+    act_regs: ActRegs
+    posts: Posts
+    carousels: Carousels
+    stories: Stories
+    points: Points
+    vouchers: Vouchers
+    ika: IKA
+    sso_mod: SSO
+    connections: Connections
+    config: Config
+    public: Public
+    integration: Integration
+    notif: Notifications
+    utils: Utils
+  }
+
+  cron: "Scheduled Tasks" {
+    style.fill: "#FFF8E1"
+    expire_points: "Daily 01:00\nExpire Points"
+    sync_prodi: "Daily 03:00\nSync Study Programs"
+    sync_alumni: "Hourly\nSync Alumni Data"
+  }
+}
+
+data: Data Layer {
+  style.fill: "#E8F5E9"
+  style.stroke: "#2E7D32"
+
+  db: "MySQL\nSequelize ORM\n25+ Tables" {
+    shape: cylinder
+    style.fill: "#C8E6C9"
+  }
+
+  fs: "Local Storage\n/uploads" {
+    shape: stored_data
+    style.fill: "#C8E6C9"
+  }
+}
+
+external: External Services {
+  style.fill: "#FCE4EC"
+  style.stroke: "#C62828"
+
+  simak: "SIMAK UNSRI API\nMahasiswa/Prodi/AKM" {
+    shape: cloud
+    style.fill: "#FFCDD2"
+  }
+
+  alumni_api: "Alumni UNSRI API\nVacancies/Softskills" {
+    shape: cloud
+    style.fill: "#FFCDD2"
+  }
+
+  smtp: "SMTP Email\nNodemailer" {
+    shape: cloud
+    style.fill: "#FFCDD2"
+  }
+
+  fcm: "Firebase FCM\nPush Notifications" {
+    shape: cloud
+    style.fill: "#FFCDD2"
+  }
+
+  voucher_partner: "Voucher Partner API\nExternal Redemption" {
+    shape: cloud
+    style.fill: "#FFCDD2"
+  }
+}
+
+sso_consumers: SSO Consumer Apps {
+  style.fill: "#F3E5F5"
+  style.stroke: "#6A1B9A"
+
+  app1: "External App 1" {shape: rectangle}
+  app2: "External App N" {shape: rectangle}
+}
+
+# ── Connections ──
+clients.web -> backend.api: "HTTPS REST\nAxios + JWT" {style.stroke: "#1565C0"}
+clients.mobile -> backend.api: "HTTPS REST\nhttp pkg + JWT" {style.stroke: "#1565C0"}
+
+backend.api -> backend.guards
+backend.api -> backend.modules
+backend.api -> backend.cron
+
+backend.modules -> data.db: "Sequelize" {style.stroke: "#2E7D32"}
+backend.modules -> data.fs: "Multer/Sharp" {style.stroke: "#2E7D32"}
+
+backend.modules -> external.simak: "REST" {style.stroke: "#C62828"}
+backend.modules -> external.alumni_api: "REST" {style.stroke: "#C62828"}
+backend.modules -> external.smtp: "SMTP" {style.stroke: "#C62828"}
+backend.modules -> external.fcm: "FCM SDK" {style.stroke: "#C62828"}
+backend.modules -> external.voucher_partner: "REST" {style.stroke: "#C62828"}
+
+backend.cron -> external.simak: "Sync" {
+  style.stroke: "#9E9E9E"
+  style.stroke-dash: 3
+}
+backend.cron -> external.alumni_api: "Sync" {
+  style.stroke: "#9E9E9E"
+  style.stroke-dash: 3
+}
+backend.cron -> data.db: "Update" {
+  style.stroke: "#9E9E9E"
+  style.stroke-dash: 3
+}
+
+sso_consumers.app1 -> backend.modules.sso_mod: "OAuth Auth Code" {style.stroke: "#6A1B9A"}
+sso_consumers.app2 -> backend.modules.sso_mod: "OAuth Auth Code" {style.stroke: "#6A1B9A"}

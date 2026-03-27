@@ -1,0 +1,224 @@
+@startuml
+skinparam backgroundColor #FAFBFD
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam linetype ortho
+skinparam roundCorner 12
+
+skinparam actor {
+  BackgroundColor #E8EAF6
+  BorderColor #5C6BC0
+  FontColor #283593
+  FontSize 13
+  Style awesome
+}
+
+skinparam usecase {
+  BackgroundColor #F5F5F5
+  BorderColor #90A4AE
+  FontColor #37474F
+  BorderThickness 1.2
+  FontSize 11
+}
+
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #B0BEC5
+  FontColor #263238
+  FontSize 14
+  FontStyle bold
+  BorderThickness 1.5
+  RoundCorner 16
+}
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #CFD8DC
+  FontColor #455A64
+  FontSize 13
+  FontStyle bold
+  BorderThickness 1
+  Style rectangle
+}
+
+skinparam arrow {
+  Color #78909C
+  FontColor #546E7A
+  FontSize 10
+  Thickness 1.2
+}
+
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #FFD54F
+  FontColor #5D4037
+  FontSize 10
+}
+
+left to right direction
+
+actor "Mahasiswa /\nAlumni" as USER
+
+rectangle "IamUNSRI — User Domain" {
+
+  package "Autentikasi" {
+    usecase "Login" as UC_LOGIN
+    usecase "Register" as UC_REGISTER
+    usecase "Forgot Password" as UC_FORGOT
+    usecase "Verify Code" as UC_VERIFY_CODE
+    usecase "Reset Password" as UC_RESET_PW
+    usecase "Change Password" as UC_CHANGE_PW
+    usecase "Logout" as UC_LOGOUT
+  }
+
+  package "Profil" {
+    usecase "Lihat Profil" as UC_PROFILE_VIEW
+    usecase "Edit Profil" as UC_PROFILE_EDIT
+    usecase "Upload Foto Profil" as UC_PROFILE_PHOTO
+    usecase "Hapus Foto Profil" as UC_PROFILE_PHOTO_DEL
+    usecase "Edit Pendidikan" as UC_PROFILE_EDU
+    usecase "Edit Pengalaman Kerja" as UC_PROFILE_WORK
+    usecase "Edit Lisensi / Sertifikasi" as UC_PROFILE_LICENSE
+    usecase "Edit Bahasa" as UC_PROFILE_LANG
+    usecase "Edit Pencapaian" as UC_PROFILE_ACHIEVE
+  }
+
+  package "Verifikasi Identitas" {
+    usecase "Kirim Verifikasi\nEmail Kampus" as UC_VERIFY_EMAIL
+    usecase "Input Kode Verifikasi" as UC_VERIFY_INPUT
+    usecase "Upload Dokumen\nVerifikasi" as UC_VERIFY_DOC
+  }
+
+  package "Lowongan Kerja" {
+    usecase "Lihat Daftar Lowongan" as UC_JOB_LIST
+    usecase "Lihat Detail Lowongan" as UC_JOB_DETAIL
+    usecase "Apply Lowongan" as UC_JOB_APPLY
+    usecase "Lihat Riwayat Lamaran" as UC_JOB_HISTORY
+    usecase "Cek Status Lamaran" as UC_JOB_STATUS
+  }
+
+  package "Kegiatan" {
+    usecase "Lihat Daftar Kegiatan" as UC_ACT_LIST
+    usecase "Lihat Detail Kegiatan" as UC_ACT_DETAIL
+    usecase "Daftar Kegiatan" as UC_ACT_REG
+    usecase "Lihat Riwayat Kegiatan" as UC_ACT_HISTORY
+  }
+
+  package "Poin & Voucher" {
+    usecase "Lihat Saldo Poin" as UC_POINT_BALANCE
+    usecase "Lihat Riwayat Poin" as UC_POINT_HISTORY
+    usecase "Lihat Daftar Voucher" as UC_VOUCHER_LIST
+    usecase "Lihat Detail Voucher" as UC_VOUCHER_DETAIL
+    usecase "Redeem Voucher" as UC_VOUCHER_REDEEM
+    usecase "Lihat Riwayat Redeem" as UC_VOUCHER_HISTORY
+  }
+
+  package "IKA" {
+    usecase "Daftar IKA" as UC_IKA_REG
+    usecase "Lihat Kartu Digital IKA" as UC_IKA_CARD
+    usecase "Donasi IKA" as UC_IKA_DONATE
+  }
+
+  package "Koneksi / Pertemanan" {
+    usecase "Kirim Request\nPertemanan" as UC_CONN_REQ
+    usecase "Terima Request" as UC_CONN_ACCEPT
+    usecase "Batalkan Request" as UC_CONN_CANCEL
+    usecase "Lihat Daftar Teman" as UC_CONN_LIST
+  }
+
+  package "Konten" {
+    usecase "Lihat Berita / Post" as UC_POST_VIEW
+    usecase "Lihat Carousel" as UC_CAROUSEL_VIEW
+    usecase "Lihat Stories" as UC_STORY_VIEW
+  }
+
+  package "SSO" {
+    usecase "Approve SSO Login" as UC_SSO_APPROVE
+  }
+
+  package "Notifikasi" {
+    usecase "Lihat Notifikasi" as UC_NOTIF_VIEW
+    usecase "Tandai Sudah Dibaca" as UC_NOTIF_READ
+  }
+}
+
+USER --> UC_LOGIN
+USER --> UC_REGISTER
+USER --> UC_FORGOT
+USER --> UC_CHANGE_PW
+USER --> UC_LOGOUT
+
+USER --> UC_PROFILE_VIEW
+USER --> UC_PROFILE_EDIT
+USER --> UC_PROFILE_PHOTO
+USER --> UC_PROFILE_PHOTO_DEL
+USER --> UC_PROFILE_EDU
+USER --> UC_PROFILE_WORK
+USER --> UC_PROFILE_LICENSE
+USER --> UC_PROFILE_LANG
+USER --> UC_PROFILE_ACHIEVE
+
+USER --> UC_VERIFY_EMAIL
+USER --> UC_VERIFY_INPUT
+USER --> UC_VERIFY_DOC
+
+USER --> UC_JOB_LIST
+USER --> UC_JOB_DETAIL
+USER --> UC_JOB_APPLY
+USER --> UC_JOB_HISTORY
+USER --> UC_JOB_STATUS
+
+USER --> UC_ACT_LIST
+USER --> UC_ACT_DETAIL
+USER --> UC_ACT_REG
+USER --> UC_ACT_HISTORY
+
+USER --> UC_POINT_BALANCE
+USER --> UC_POINT_HISTORY
+USER --> UC_VOUCHER_LIST
+USER --> UC_VOUCHER_DETAIL
+USER --> UC_VOUCHER_REDEEM
+USER --> UC_VOUCHER_HISTORY
+
+USER --> UC_IKA_REG
+USER --> UC_IKA_CARD
+USER --> UC_IKA_DONATE
+
+USER --> UC_CONN_REQ
+USER --> UC_CONN_ACCEPT
+USER --> UC_CONN_CANCEL
+USER --> UC_CONN_LIST
+
+USER --> UC_POST_VIEW
+USER --> UC_CAROUSEL_VIEW
+USER --> UC_STORY_VIEW
+
+USER --> UC_SSO_APPROVE
+
+USER --> UC_NOTIF_VIEW
+USER --> UC_NOTIF_READ
+
+UC_FORGOT ..> UC_VERIFY_CODE : <<include>>
+UC_VERIFY_CODE ..> UC_RESET_PW : <<include>>
+UC_JOB_APPLY ..> UC_JOB_DETAIL : <<extends>>
+UC_ACT_REG ..> UC_ACT_DETAIL : <<extends>>
+UC_VOUCHER_REDEEM ..> UC_VOUCHER_DETAIL : <<extends>>
+UC_VERIFY_INPUT ..> UC_VERIFY_EMAIL : <<extends>>
+
+note right of UC_JOB_APPLY
+  Memerlukan user
+  sudah terverifikasi
+end note
+
+note right of UC_ACT_REG
+  Memerlukan user
+  sudah terverifikasi
+end note
+
+note right of UC_VOUCHER_REDEEM
+  Memerlukan user
+  terverifikasi + poin cukup
+end note
+
+@enduml

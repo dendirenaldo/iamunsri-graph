@@ -1,0 +1,204 @@
+@startuml
+' ══════════════════════════════════════
+' CUSTOM PREMIUM SOFT THEME
+' ══════════════════════════════════════
+skinparam backgroundColor #FAFBFD
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam linetype ortho
+skinparam roundCorner 12
+
+skinparam actor {
+  BackgroundColor #E8EAF6
+  BorderColor #5C6BC0
+  FontColor #283593
+  FontSize 13
+  Style awesome
+}
+
+skinparam usecase {
+  BackgroundColor #F5F5F5
+  BorderColor #90A4AE
+  FontColor #37474F
+  BorderThickness 1.2
+  FontSize 11
+}
+
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #B0BEC5
+  FontColor #263238
+  FontSize 14
+  FontStyle bold
+  BorderThickness 1.5
+  RoundCorner 16
+}
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #CFD8DC
+  FontColor #455A64
+  FontSize 13
+  FontStyle bold
+  BorderThickness 1
+  Style rectangle
+}
+
+skinparam arrow {
+  Color #78909C
+  FontColor #546E7A
+  FontSize 10
+  Thickness 1.2
+}
+
+skinparam note {
+  BackgroundColor #FFF8E1
+  BorderColor #FFD54F
+  FontColor #5D4037
+  FontSize 10
+}
+
+left to right direction
+
+actor "Admin" as ADMIN
+
+rectangle "IamUNSRI — Admin Domain" {
+
+  package "Manajemen User" {
+    usecase "Lihat Daftar User" as UC_USER_LIST
+    usecase "Tambah User" as UC_USER_CREATE
+    usecase "Edit User" as UC_USER_EDIT
+    usecase "Hapus User" as UC_USER_DELETE
+    usecase "Reset Password User" as UC_USER_RESET
+  }
+
+  package "RBAC" {
+    usecase "Kelola Roles" as UC_ROLE_MANAGE
+    usecase "Kelola Permissions" as UC_PERM_MANAGE
+    usecase "Assign Role ke User" as UC_ROLE_ASSIGN
+    usecase "Assign Permission ke Role" as UC_PERM_ASSIGN
+  }
+
+  package "Verifikasi" {
+    usecase "Lihat Antrian Verifikasi" as UC_VERIFY_LIST
+    usecase "Approve Verifikasi" as UC_VERIFY_APPROVE
+    usecase "Reject Verifikasi" as UC_VERIFY_REJECT
+  }
+
+  package "Manajemen Lowongan" {
+    usecase "Lihat Semua Lowongan" as UC_JOB_LIST
+    usecase "Tambah Lowongan" as UC_JOB_CREATE
+    usecase "Edit Lowongan" as UC_JOB_EDIT
+    usecase "Hapus Lowongan" as UC_JOB_DELETE
+    usecase "Lihat Pelamar" as UC_JOB_APPLICANTS
+    usecase "Update Status Lamaran" as UC_JOB_APP_STATUS
+  }
+
+  package "Manajemen Kegiatan" {
+    usecase "Lihat Semua Kegiatan" as UC_ACT_LIST
+    usecase "Tambah Kegiatan" as UC_ACT_CREATE
+    usecase "Edit Kegiatan" as UC_ACT_EDIT
+    usecase "Hapus Kegiatan" as UC_ACT_DELETE
+    usecase "Lihat Peserta" as UC_ACT_PARTICIPANTS
+    usecase "Update Status Registrasi" as UC_ACT_REG_STATUS
+  }
+
+  package "Manajemen Konten" {
+    usecase "Kelola Post/Berita" as UC_POST_MANAGE
+    usecase "Kelola Carousel" as UC_CAROUSEL_MANAGE
+  }
+
+  package "Manajemen Voucher" {
+    usecase "Lihat Voucher" as UC_VOUCHER_LIST
+    usecase "Tambah Voucher" as UC_VOUCHER_CREATE
+    usecase "Edit Voucher" as UC_VOUCHER_EDIT
+    usecase "Hapus Voucher" as UC_VOUCHER_DELETE
+    usecase "Lihat Redeemers" as UC_VOUCHER_REDEEMERS
+  }
+
+  package "Manajemen Perusahaan" {
+    usecase "Kelola Data Perusahaan" as UC_COMPANY_MANAGE
+  }
+
+  package "IKA & Alumni" {
+    usecase "Import Data Alumni" as UC_IKA_IMPORT
+    usecase "Preview Import" as UC_IKA_PREVIEW
+    usecase "Commit Import" as UC_IKA_COMMIT
+  }
+
+  package "Integrasi & Sync" {
+    usecase "Sync Lowongan Eksternal" as UC_SYNC_VACANCY
+    usecase "Sync Softskills" as UC_SYNC_SOFTSKILL
+    usecase "Sync Program Studi" as UC_SYNC_PRODI
+  }
+
+  package "Konfigurasi Sistem" {
+    usecase "Kelola Konfigurasi App" as UC_CONFIG_MANAGE
+    usecase "Kelola Versi App" as UC_CONFIG_VERSION
+  }
+
+  package "Utilitas" {
+    usecase "Upload File" as UC_UPLOAD
+  }
+}
+
+ADMIN --> UC_USER_LIST
+ADMIN --> UC_USER_CREATE
+ADMIN --> UC_USER_EDIT
+ADMIN --> UC_USER_DELETE
+ADMIN --> UC_USER_RESET
+
+ADMIN --> UC_ROLE_MANAGE
+ADMIN --> UC_PERM_MANAGE
+ADMIN --> UC_ROLE_ASSIGN
+ADMIN --> UC_PERM_ASSIGN
+
+ADMIN --> UC_VERIFY_LIST
+ADMIN --> UC_VERIFY_APPROVE
+ADMIN --> UC_VERIFY_REJECT
+
+ADMIN --> UC_JOB_LIST
+ADMIN --> UC_JOB_CREATE
+ADMIN --> UC_JOB_EDIT
+ADMIN --> UC_JOB_DELETE
+ADMIN --> UC_JOB_APPLICANTS
+ADMIN --> UC_JOB_APP_STATUS
+
+ADMIN --> UC_ACT_LIST
+ADMIN --> UC_ACT_CREATE
+ADMIN --> UC_ACT_EDIT
+ADMIN --> UC_ACT_DELETE
+ADMIN --> UC_ACT_PARTICIPANTS
+ADMIN --> UC_ACT_REG_STATUS
+
+ADMIN --> UC_POST_MANAGE
+ADMIN --> UC_CAROUSEL_MANAGE
+
+ADMIN --> UC_VOUCHER_LIST
+ADMIN --> UC_VOUCHER_CREATE
+ADMIN --> UC_VOUCHER_EDIT
+ADMIN --> UC_VOUCHER_DELETE
+ADMIN --> UC_VOUCHER_REDEEMERS
+
+ADMIN --> UC_COMPANY_MANAGE
+
+ADMIN --> UC_IKA_IMPORT
+UC_IKA_IMPORT ..> UC_IKA_PREVIEW : <<include>>
+UC_IKA_IMPORT ..> UC_IKA_COMMIT : <<include>>
+
+ADMIN --> UC_SYNC_VACANCY
+ADMIN --> UC_SYNC_SOFTSKILL
+ADMIN --> UC_SYNC_PRODI
+
+ADMIN --> UC_CONFIG_MANAGE
+ADMIN --> UC_CONFIG_VERSION
+
+ADMIN --> UC_UPLOAD
+
+UC_VERIFY_APPROVE ..> UC_VERIFY_LIST : <<extends>>
+UC_VERIFY_REJECT ..> UC_VERIFY_LIST : <<extends>>
+UC_JOB_APP_STATUS ..> UC_JOB_APPLICANTS : <<extends>>
+UC_ACT_REG_STATUS ..> UC_ACT_PARTICIPANTS : <<extends>>
+
+@enduml

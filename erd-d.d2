@@ -1,0 +1,210 @@
+direction: down
+
+title: "IamUNSRI ERD — Reward, Content, Community, SSO" {
+  near: top-center
+  style.font-size: 24
+  style.bold: true
+}
+
+users: Users {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  full_name: varchar
+  points: int
+}
+
+# ── Reward ──
+vouchers: Vouchers {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  name: varchar
+  description: text
+  points_required: int
+  stock: int
+  redeem_type: enum
+  integration_config: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+point_transactions: Point_Transactions {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  type: enum
+  status: enum
+  points: int
+  points_remaining: int
+  expires_at: datetime
+  voucher_id: int {constraint: foreign_key}
+  redeem_data: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+# ── Content ──
+posts: Posts {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  author_id: int {constraint: foreign_key}
+  slug: varchar {constraint: unique}
+  type: enum
+  title: varchar
+  content: text
+  thumbnail: varchar
+  is_sync_disabled: boolean
+  created_at: datetime
+  updated_at: datetime
+}
+
+carousels: Carousels {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  title: varchar
+  image_url: varchar
+  is_active: boolean
+  created_at: datetime
+  updated_at: datetime
+}
+
+stories: Stories {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  media_url: varchar
+  type: enum
+  overlays: json
+  expires_at: datetime
+  created_at: datetime
+  updated_at: datetime
+}
+
+# ── Study Program & CPL ──
+study_programs: Study_Programs {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  name: varchar
+  level: varchar
+  faculty: varchar
+  simak_prodi_id: varchar
+  is_pending_deletion: boolean
+  created_at: datetime
+  updated_at: datetime
+}
+
+cpls: CPLs {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  study_program_id: int {constraint: foreign_key}
+  kode: varchar
+  deskripsi: text
+  category: varchar
+  created_at: datetime
+  updated_at: datetime
+}
+
+user_cpls: User_CPLs {
+  shape: sql_table
+  user_id: int {constraint: [primary_key; foreign_key]}
+  cpl_id: int {constraint: [primary_key; foreign_key]}
+}
+
+# ── IKA ──
+ika_members: IKA_Members {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  nim: varchar
+  nama: varchar
+  angkatan: int
+  account_status: varchar
+  study_work_fields: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+ika_donations: IKA_Donations {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  amount: decimal
+  method: varchar
+  notes: text
+  created_at: datetime
+  updated_at: datetime
+}
+
+# ── Connections ──
+user_connections: User_Connections {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  requester_id: int {constraint: foreign_key}
+  recipient_id: int {constraint: foreign_key}
+  status: varchar
+  created_at: datetime
+  updated_at: datetime
+}
+
+# ── SSO ──
+sso_clients: SSO_Clients {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  client_id: varchar {constraint: unique}
+  client_secret: varchar
+  name: varchar
+  redirect_uris: json
+  created_at: datetime
+  updated_at: datetime
+}
+
+sso_auth_codes: SSO_Auth_Codes {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  code: varchar {constraint: unique}
+  sso_client_id: int {constraint: foreign_key}
+  user_id: int {constraint: foreign_key}
+  expires_at: datetime
+  created_at: datetime
+  updated_at: datetime
+}
+
+sso_access_tokens: SSO_Access_Tokens {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  token: varchar {constraint: unique}
+  sso_client_id: int {constraint: foreign_key}
+  user_id: int {constraint: foreign_key}
+  expires_at: datetime
+  created_at: datetime
+  updated_at: datetime
+}
+
+# ── Config ──
+configurations: Configurations {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  key: varchar {constraint: unique}
+  value: text
+  created_at: datetime
+  updated_at: datetime
+}
+
+# Relationships
+users -> point_transactions: "1..*" {style.stroke: "#C62828"}
+vouchers -> point_transactions: "redeemed" {style.stroke: "#E65100"}
+users -> posts: "authors" {style.stroke: "#1565C0"}
+users -> stories: "creates" {style.stroke: "#1565C0"}
+study_programs -> cpls: "1..*" {style.stroke: "#6A1B9A"}
+cpls -> user_cpls: "1..*" {style.stroke: "#6A1B9A"}
+users -> user_cpls: "1..*" {style.stroke: "#6A1B9A"}
+users -> ika_members: "1..1" {style.stroke: "#2E7D32"}
+users -> ika_donations: "1..*" {style.stroke: "#2E7D32"}
+users -> user_connections: "requester" {style.stroke: "#FF9800"}
+users -> user_connections: "recipient" {
+  style.stroke: "#FF9800"
+  style.stroke-dash: 3
+}
+sso_clients -> sso_auth_codes: "1..*" {style.stroke: "#00695C"}
+sso_clients -> sso_access_tokens: "1..*" {style.stroke: "#00695C"}
+users -> sso_auth_codes: "1..*" {style.stroke: "#607D8B"}
+users -> sso_access_tokens: "1..*" {style.stroke: "#607D8B"}
