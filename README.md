@@ -1,6 +1,6 @@
 # iamunsri-graph
 
-Repositori ini berisi kumpulan diagram untuk dokumentasi sistem IAM UNSRI.
+Repositori ini berisi kumpulan diagram untuk dokumentasi sistem IamUNSRI.
 
 ## Isi Utama
 
